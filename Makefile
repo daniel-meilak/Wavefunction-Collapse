@@ -30,7 +30,7 @@ RAYLIB_API_VERSION ?= 300
 RAYLIB_PATH        ?= ..\..
 
 # Define compiler path on Windows
-COMPILER_PATH      ?= C:/raylib/w64devkit/bin
+COMPILER_PATH      ?= C:/raylib/mingw64/bin
 
 # Define default options
 # One of PLATFORM_DESKTOP, PLATFORM_RPI, PLATFORM_ANDROID, PLATFORM_WEB
@@ -195,7 +195,7 @@ endif
 #  -std=gnu99           defines C language mode (GNU C from 1999 revision)
 #  -Wno-missing-braces  ignore invalid warning (GCC bug 53119)
 #  -D_DEFAULT_SOURCE    use with -std=c99 on Linux and PLATFORM_WEB, required for timespec
-CFLAGS += -Wall -std=c++20 -D_DEFAULT_SOURCE -Wno-missing-braces
+CFLAGS += -Wall -std=c++20 -D_DEFAULT_SOURCE -Wno-missing-braces -static-libgcc -static-libstdc++
 
 ifeq ($(BUILD_MODE),DEBUG)
     CFLAGS += -g -O0
@@ -209,7 +209,7 @@ ifeq ($(PLATFORM),PLATFORM_DESKTOP)
     ifeq ($(PLATFORM_OS),WINDOWS)
         # resource file contains windows executable icon and properties
         # -Wl,--subsystem,windows hides the console window
-        CFLAGS += $(RAYLIB_PATH)/src/raylib.rc.data
+        # CFLAGS += $(RAYLIB_PATH)/src/raylib.rc.data
     endif
     ifeq ($(PLATFORM_OS),LINUX)
         ifeq ($(RAYLIB_LIBTYPE),STATIC)
