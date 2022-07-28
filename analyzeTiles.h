@@ -12,14 +12,24 @@
 #include<utility>
 #include<vector>
 
+#include"constants.h"
+#include"point.h"
+
 // map of tile index to bitset e.g. {0,1}->[0001]
-std::map<std::pair<int,int>, std::bitset<64>> getBitset;
+std::map<tileState, Bitset> getBitset;
+
+// map of bitset to tile index
+std::unordered_map<Bitset,tileState> getTile;
 
 // map of tile to left-right connection
-std::unordered_map<std::bitset<64>,std::bitset<64>> leftRightCon;
+std::unordered_map<Bitset,Bitset> leftRightCon;
 
-// map of rotations (by 90 degrees clockwise)
-std::unordered_map<std::bitset<64>,std::bitset<64>> rotate;
+// map of rotations (by 90 degrees)
+std::unordered_map<Bitset,Bitset> rightRotation;
+std::unordered_map<Bitset,Bitset> leftRotation;
+
+// number of unique tiles
+std::size_t uniqueTiles;
 
 // read information on tileset from file
 // tile properties are represented in braket notation int the file {a,b}. a=tile index, b=orientation
@@ -34,12 +44,13 @@ void analyzeTiles(std::string filename){
 
    // create list of tiles in braket {a,b} and bitset (00010) form 
    std::string line;
-   std::size_t id{0}, index{0};
+   int id{0};
+   std::size_t index{0};
    std::getline(dataFile,line);
    for (char c : line){
 
-      std::vector<std::pair<int,int>> brackets{{id,0},{id,1},{id,2},{id,3}};
-      std::vector<std::bitset<64>> bits{(1ull<<index),(1ull<<(index+1)),(1ull<<(index+2)),(1ull<<(index+3))};
+      std::vector<tileState> brackets{{id,0},{id,1},{id,2},{id,3}};
+      std::vector<Bitset> bits{(1ull<<index),(1ull<<(index+1)),(1ull<<(index+2)),(1ull<<(index+3))};
 
       // skip ',' 
       if (c==','){ continue; }
@@ -48,7 +59,9 @@ void analyzeTiles(std::string filename){
 
       for (int i=0; i<symmetry; i++){
          getBitset[brackets[i]] = bits[i];
-         rotate[bits[i]] = bits[(i+1)%symmetry];
+         getTile[bits[i]] = brackets[i];
+         rightRotation[bits[i]] = bits[(i+1)%symmetry];
+         leftRotation[(i+1)%symmetry] = bits[i];
       }
 
       id++;
@@ -56,11 +69,14 @@ void analyzeTiles(std::string filename){
    }
    std::getline(dataFile, line);
 
+   // set number of unique tiles
+   uniqueTiles = getBitset.size();
+
    // regex matching "{a,b}", returning a,b as submatches
    std::regex tileIndices("\\{(\\d+)\\,(\\d+)\\}");
 
    // keep track of connection names for next part
-   std::unordered_map<std::string, std::bitset<64>> connectionBitset; 
+   std::unordered_map<std::string, Bitset> connectionBitset; 
 
    // create bitsets for named connections
    while (std::getline(dataFile,line)){
@@ -73,7 +89,7 @@ void analyzeTiles(std::string filename){
       std::string name  = line.substr(0,pos-1);
 
       // read connections in bracket notation
-      std::vector<std::bitset<64>> connection, rotation;
+      std::vector<Bitset> connection, rotation;
 
       // use regex to get each unique tile
       // get matches from beginning to end of line 
@@ -85,7 +101,7 @@ void analyzeTiles(std::string filename){
       }
 
       // create bitset for connection
-      std::bitset<64> bits;
+      Bitset bits;
       for (const auto& tile : connection){ bits |= tile; }
       connectionBitset[name] = bits;
 
@@ -93,14 +109,14 @@ void analyzeTiles(std::string filename){
       rotation = connection;
       for (int i=0; i<4; i++){
         
-         std::bitset<64> copyBits, rotationBits;
+         Bitset copyBits, rotationBits;
          for (auto& tile : rotation){
             copyBits |= tile;
-            tile = rotate[tile];
+            tile = rightRotation[tile];
             rotationBits |= tile;
          }
 
-         rotate[copyBits] = rotationBits;
+         rightRotation[copyBits] = rotationBits;
 
          // stop early for connections with symmetry < 4
          if (bits==rotationBits){ break; }
@@ -127,12 +143,21 @@ void analyzeTiles(std::string filename){
             std::exit(EXIT_FAILURE);
          }
          
-         std::bitset<64> bits = getBitset[{std::stoi(i->str(1)),std::stoi(i->str(2))}];
+         Bitset bits = getBitset[{std::stoi(i->str(1)),std::stoi(i->str(2))}];
          leftRightCon[bits] = connectionBitset[name];
       }
    }
+}
 
-   for (auto [key,value] : leftRightCon){
-      std::cout << key.to_string() << "   " << value.to_string() << std::endl;
+// rotate a unique tile clockwise. n: 0-0deg, 1-90deg, 2-180deg, 3-270deg
+Bitset rotate(const Bitset& tile, int n, bool clockwise){
+   switch (n){
+   case 0: return tile;
+   case 1: return clockwise ? rightRotation[tile] : leftRotation[tile];
+   case 2: return leftRotation[leftRotation[tile]];
+   case 3: return clockwise ? leftRotation[tile] : rightRotation[tile];
+   default:
+      std::cerr << "Invalid rotation\n";
+      std::exit(EXIT_FAILURE);
    }
 }
