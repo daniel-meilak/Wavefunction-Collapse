@@ -19,7 +19,7 @@ int main(){
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        if (IsKeyDown(KEY_SPACE)){ grid.update(); }
+        if (IsKeyReleased(KEY_SPACE)){ grid.update(); }
         grid.draw();
 
         EndDrawing();
