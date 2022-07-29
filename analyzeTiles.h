@@ -22,7 +22,7 @@ std::map<tileState, Bitset> getBitset;
 std::unordered_map<Bitset,tileState> getTile;
 
 // map of tile to left-right connection
-std::unordered_map<Bitset,Bitset> leftRightCon;
+std::unordered_map<Bitset,Bitset> connectsTo;
 
 // map of rotations (by 90 degrees)
 std::unordered_map<Bitset,Bitset> rightRotation;
@@ -61,7 +61,7 @@ void analyzeTiles(std::string filename){
          getBitset[brackets[i]] = bits[i];
          getTile[bits[i]] = brackets[i];
          rightRotation[bits[i]] = bits[(i+1)%symmetry];
-         leftRotation[(i+1)%symmetry] = bits[i];
+         leftRotation[bits[(i+1)%symmetry]] = bits[i];
       }
 
       id++;
@@ -117,6 +117,7 @@ void analyzeTiles(std::string filename){
          }
 
          rightRotation[copyBits] = rotationBits;
+         leftRotation[rotationBits] = copyBits;
 
          // stop early for connections with symmetry < 4
          if (bits==rotationBits){ break; }
@@ -144,18 +145,18 @@ void analyzeTiles(std::string filename){
          }
          
          Bitset bits = getBitset[{std::stoi(i->str(1)),std::stoi(i->str(2))}];
-         leftRightCon[bits] = connectionBitset[name];
+         connectsTo[bits] = connectionBitset[name];
       }
    }
 }
 
 // rotate a unique tile clockwise. n: 0-0deg, 1-90deg, 2-180deg, 3-270deg
-Bitset rotate(const Bitset& tile, int n, bool clockwise){
+void rotate(Bitset& tile, int n, bool clockwise){
    switch (n){
-   case 0: return tile;
-   case 1: return clockwise ? rightRotation[tile] : leftRotation[tile];
-   case 2: return leftRotation[leftRotation[tile]];
-   case 3: return clockwise ? leftRotation[tile] : rightRotation[tile];
+   case 0: break;
+   case 1: tile = clockwise ? rightRotation[tile] : leftRotation[tile]; break;
+   case 2: tile =  leftRotation[leftRotation[tile]]; break;
+   case 3: tile = clockwise ? leftRotation[tile] : rightRotation[tile]; break;
    default:
       std::cerr << "Invalid rotation\n";
       std::exit(EXIT_FAILURE);
