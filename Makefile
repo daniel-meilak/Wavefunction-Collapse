@@ -200,7 +200,7 @@ CFLAGS += -Wall -std=c++20 -D_DEFAULT_SOURCE -Wno-missing-braces -static-libgcc 
 ifeq ($(BUILD_MODE),DEBUG)
     CFLAGS += -g -O0
 else
-    CFLAGS += -s -O1
+    CFLAGS += -s -O3
 endif
 
 # Additional flags for compiler (if desired)
