@@ -28,6 +28,9 @@ std::unordered_map<Bitset,Bitset> connectsTo;
 std::unordered_map<Bitset,Bitset> rightRotation;
 std::unordered_map<Bitset,Bitset> leftRotation;
 
+// vector of weights for each tile
+std::vector<int> weights;
+
 // number of unique tiles
 std::size_t uniqueTiles;
 
@@ -42,26 +45,38 @@ void analyzeTiles(std::string filename){
       std::exit(EXIT_FAILURE);
    }
 
+   // regex matching "{a,b}", returning a,b as submatches
+   std::regex tileIndices("\\{(\\d+)\\,(\\d+)\\}");
+
    // create list of tiles in braket {a,b} and bitset (00010) form 
    std::string line;
    int id{0};
    std::size_t index{0};
    std::getline(dataFile,line);
-   for (char c : line){
 
+   // use regex to get each {a,b} a=tile symmetry, b=tile weight
+   auto begin = std::sregex_iterator(line.begin(), line.end(), tileIndices);
+   auto end   = std::sregex_iterator();
+
+   for (std::sregex_iterator i=begin; i!=end; ++i){
+      
       std::vector<tileState> brackets{{id,0},{id,1},{id,2},{id,3}};
       std::vector<Bitset> bits{(1ull<<index),(1ull<<(index+1)),(1ull<<(index+2)),(1ull<<(index+3))};
+      
+      int symmetry = std::stoi(i->str(1));
 
-      // skip ',' 
-      if (c==','){ continue; }
+      for (int j=0; j<symmetry; j++){
+         
+         // create maps from tileState<->bitset
+         getBitset[brackets[j]] = bits[j];
+         getTile[bits[j]] = brackets[j];
 
-      int symmetry=c-'0';
+         // create maps for right and left rotations
+         rightRotation[bits[j]] = bits[(j+1)%symmetry];
+         leftRotation[bits[(j+1)%symmetry]] = bits[j];
 
-      for (int i=0; i<symmetry; i++){
-         getBitset[brackets[i]] = bits[i];
-         getTile[bits[i]] = brackets[i];
-         rightRotation[bits[i]] = bits[(i+1)%symmetry];
-         leftRotation[bits[(i+1)%symmetry]] = bits[i];
+         // fill weights for each unique tile
+         weights.push_back(std::stof(i->str(2)));
       }
 
       id++;
@@ -71,9 +86,6 @@ void analyzeTiles(std::string filename){
 
    // set number of unique tiles
    uniqueTiles = getBitset.size();
-
-   // regex matching "{a,b}", returning a,b as submatches
-   std::regex tileIndices("\\{(\\d+)\\,(\\d+)\\}");
 
    // keep track of connection names for next part
    std::unordered_map<std::string, Bitset> connectionBitset; 
