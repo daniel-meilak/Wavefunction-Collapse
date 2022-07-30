@@ -6,6 +6,9 @@
 
 #include"point.h"
 
+// simulation fps
+constexpr int fps{30};
+
 // tile size multiplier
 constexpr int scale{3};
 
@@ -14,8 +17,8 @@ constexpr int tileSize{14};
 constexpr int tileScaled{scale*tileSize};
 
 // grid dimensions
-constexpr int gridWidth{20};
-constexpr int gridHeight{15};
+constexpr int gridWidth{30};
+constexpr int gridHeight{20};
 
 // window size
 constexpr int screenWidth{gridWidth*tileSize*scale};

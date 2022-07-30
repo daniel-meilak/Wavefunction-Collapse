@@ -13,13 +13,13 @@ int main(){
     // create grid with tieset and data sheet
     Grid grid("tilesets/circuit.png", "tilesets/circuit_data.txt");
 
-    SetTargetFPS(20);
+    SetTargetFPS(fps);
     while(!WindowShouldClose()){
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        // if (IsKeyDown(KEY_SPACE)){ grid.update(); }
+        //if (IsKeyDown(KEY_SPACE)){ grid.update(); }
         grid.update();
         grid.draw();
 
