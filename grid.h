@@ -115,18 +115,20 @@ void Grid::update(){
    // if there are multiple possibilities
    if (entropy!=1){
       
-      // get all possible unique tiles to collapse to
-      std::vector<int> possibilities;
+      // get all possible unique tiles to collapse to and set up weights
+      std::vector<int> possibilities, adjustedWeights;
       for (std::size_t i=0; i<uniqueTiles; i++){
-         if (currentBitset[i]){ possibilities.push_back(i); }
+         if (currentBitset[i]){
+            possibilities.push_back(i);
+            adjustedWeights.push_back(weights[i]);
+         }
       }
-      
-      // choose one of the possibilites
-      int bitPos;
-      std::sample(possibilities.begin(), possibilities.end(), &bitPos, 1,gen);
+
+      // set up a distribution
+      std::discrete_distribution dist(adjustedWeights.begin(), adjustedWeights.end());
 
       // get bitset of new tile and orientation
-      currentBitset = Bitset{1ull<<bitPos};
+      currentBitset = Bitset{1ull<<possibilities[dist(gen)]};
    }
 
    // get tile configuration 
