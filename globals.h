@@ -1,6 +1,7 @@
 #pragma once
 
 #include<array>
+#include<bitset>
 #include<cstddef>
 #include<utility>
 
@@ -33,6 +34,9 @@ constexpr std::array<Point,4> cardinals{Point(1,0),Point(0,1),Point(-1,0),Point(
 
 // clearer names for rotate() 
 enum dir{clockwise=true, anticlockwise=false};
+
+// Textures
+constexpr int maxTextures{50};
 
 // debug
 constexpr bool debug{false};
