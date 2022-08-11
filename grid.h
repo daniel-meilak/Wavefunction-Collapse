@@ -16,7 +16,7 @@
 #include"raylib.h"
 
 #include"analyzeTiles.h"
-#include"constants.h"
+#include"globals.h"
 
 struct Tile{
    Texture2D& texture;
@@ -28,7 +28,7 @@ struct Tile{
 struct Grid{
 
    // tileset
-   Texture2D texture;
+   Texture2D& texture;
 
    // bitset grid
    std::vector<std::vector<Bitset>> bitsetGrid;
@@ -46,7 +46,7 @@ struct Grid{
    bool collapsed{false};
 
    // construct grid. Add texture ref to tiles, set up random number gen, choose initial starting point
-   Grid(std::string tileset, std::string dataSheet);
+   Grid(Texture2D& texture, std::string dataSheet);
 
    // debugging tileset analysis. Shows left<->right connections for each unique tile
    void debugTileset();
@@ -79,10 +79,12 @@ void Grid::resetEntropy(){
    }
 }
 
-Grid::Grid(std::string tileset, std::string dataSheet): texture(LoadTexture(tileset.c_str())){
+Grid::Grid(Texture2D& texture, std::string dataSheet = ""): texture(texture){
 
-   // analyze tileset data
-   analyzeTiles(dataSheet);
+   // analyze tileset data if dataSheet is provided
+   if (!dataSheet.empty()){ analyzeTiles(dataSheet); }
+   // automatically work out tileset connections for WANG tilesets
+   // else { analyzeWANG(texture); }
 
    bitsetGrid = std::vector<std::vector<Bitset>>(gridHeight,std::vector<Bitset>(gridWidth,Bitset(std::string(uniqueTiles,'1'))));
    tileGrid = std::vector<std::vector<Tile>>(gridHeight, std::vector<Tile>(gridWidth,Tile(texture)));

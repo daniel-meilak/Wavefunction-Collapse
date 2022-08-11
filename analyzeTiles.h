@@ -12,7 +12,7 @@
 #include<utility>
 #include<vector>
 
-#include"constants.h"
+#include"globals.h"
 #include"point.h"
 
 // map of tile index to bitset e.g. {0,1}->[0001]
