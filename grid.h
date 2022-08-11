@@ -42,6 +42,12 @@ struct Grid{
    // random numbers
    std::mt19937 gen;
 
+   // grid update time
+   int updateSpeed{30};
+
+   // pause grid update
+   bool running{true};
+
    // flag for full collapse
    bool collapsed{false};
 
@@ -109,8 +115,14 @@ void Grid::reset(){
 
 void Grid::update(){
 
-   // if all tiles are collapsed, continue
-   if (collapsed){ return; }
+   // if grid is paused
+   // or all tiles are collapsed
+   // or not enough time has passed for next update
+   // continue
+   if (!running || collapsed || sinceLastUpdate < 1.0f/updateSpeed){ return; }
+
+   // reset time since last update
+   sinceLastUpdate=0.0f;
 
    //------------------------------
    // collapse a tile
