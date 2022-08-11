@@ -62,9 +62,6 @@ struct Grid{
 
    // reset entropy
    void resetEntropy();
-
-   // unload texture
-   void unloadTexture(){ UnloadTexture(texture); }
 };
 
 void Grid::resetEntropy(){

@@ -5,13 +5,14 @@
 #include"raylib.h"
 
 #include"grid.h"
+#include"storage.h"
 
 int main(){
 
     InitWindow(screenWidth, screenHeight, "Wavefunction Collapse"); 
 
     // create grid with tieset and data sheet
-    Grid grid("tilesets/circuit.png", "tilesets/circuit_data.txt");
+    Grid grid(textureStore.add("tilesets/circuit.png"), "tilesets/circuit_data.txt");
 
     SetTargetFPS(fps);
     while(!WindowShouldClose()){
@@ -27,8 +28,9 @@ int main(){
         EndDrawing();
     }
 
-    // unload grid texture
-    grid.unloadTexture();
+    // unload all fonts and textures
+    textureStore.unloadAll();
+    fontStore.unloadAll();
 
     CloseWindow();
 
