@@ -6,7 +6,7 @@ Currently the work requires raylib to be preinstalled (with a working C++ compil
 
 The C++ code is written using modern C++, and requires C++20 support to compile. 
 
-The circuit tileset included in `tilesets/` is also from Maxim Gumin's [repo](https://github.com/mxgmn/WaveFunctionCollapse/tree/master/tilesets/Circuit). The data file has no specific format, I may change it to json/xml/yaml in the future to improve readability.
+The circuit tileset included in `tilesets/` is also from Maxim Gumin's [repo](https://github.com/mxgmn/WaveFunctionCollapse/tree/master/tilesets/Circuit) (with minor adjustments). The data file has no specific format, I may change it to json/xml/yaml in the future to improve readability.
 
 ## Examples:
 

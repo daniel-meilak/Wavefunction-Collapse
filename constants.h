@@ -33,3 +33,6 @@ constexpr std::array<Point,4> cardinals{Point(1,0),Point(0,1),Point(-1,0),Point(
 
 // clearer names for rotate() 
 enum dir{clockwise=true, anticlockwise=false};
+
+// debug
+constexpr bool debug{false};

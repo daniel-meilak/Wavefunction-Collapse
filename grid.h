@@ -46,25 +46,7 @@ struct Grid{
    bool collapsed{false};
 
    // construct grid. Add texture ref to tiles, set up random number gen, choose initial starting point
-   Grid(std::string tileset, std::string dataSheet): texture(LoadTexture(tileset.c_str())){
-
-      // analyze tileset data
-      analyzeTiles(dataSheet);
-
-      bitsetGrid = std::vector<std::vector<Bitset>>(gridHeight,std::vector<Bitset>(gridWidth,Bitset(std::string(uniqueTiles,'1'))));
-      tileGrid = std::vector<std::vector<Tile>>(gridHeight, std::vector<Tile>(gridWidth,Tile(texture)));
-
-      std::random_device rd; // slow, high quality, random number to seed fast generator
-      
-      gen.seed(rd());
-
-      // fill entropyList
-      for (int i=0; i<gridWidth; i++){
-         for (int j=0; j<gridHeight; j++){
-            entropyList[uniqueTiles].insert({i,j});
-         }
-      }
-   }
+   Grid(std::string tileset, std::string dataSheet);
 
    // debugging tileset analysis. Shows left<->right connections for each unique tile
    void debugTileset();
@@ -78,13 +60,52 @@ struct Grid{
    // reset grid to default state
    void reset();
 
+   // reset entropy
+   void resetEntropy();
+
    // unload texture
    void unloadTexture(){ UnloadTexture(texture); }
 };
 
-void Grid::reset(){
+void Grid::resetEntropy(){
+
+   entropyList.clear();
+
+   // fill entropyList
+   for (int i=0; i<gridWidth; i++){
+      for (int j=0; j<gridHeight; j++){
+         entropyList[uniqueTiles].insert({i,j});
+      }
+   }
+}
+
+Grid::Grid(std::string tileset, std::string dataSheet): texture(LoadTexture(tileset.c_str())){
+
+   // analyze tileset data
+   analyzeTiles(dataSheet);
+
    bitsetGrid = std::vector<std::vector<Bitset>>(gridHeight,std::vector<Bitset>(gridWidth,Bitset(std::string(uniqueTiles,'1'))));
    tileGrid = std::vector<std::vector<Tile>>(gridHeight, std::vector<Tile>(gridWidth,Tile(texture)));
+
+   std::random_device rd; // slow, high quality, random number to seed fast generator
+   
+   gen.seed(rd());
+
+   // fill entropyList
+   resetEntropy();
+}
+
+void Grid::reset(){
+   
+   // reset Grids
+   bitsetGrid = std::vector<std::vector<Bitset>>(gridHeight,std::vector<Bitset>(gridWidth,Bitset(std::string(uniqueTiles,'1'))));
+   tileGrid = std::vector<std::vector<Tile>>(gridHeight, std::vector<Tile>(gridWidth,Tile(texture)));
+
+   // reset Entropy
+   resetEntropy();
+
+   // set state to uncollapsed
+   collapsed = false;
 }
 
 void Grid::update(){
@@ -141,7 +162,7 @@ void Grid::update(){
    // check if wavefunction is fully collapsed
    if (entropyList.empty()){
       collapsed = true;
-      std::cout << "Grid is fully Collapsed!\n";
+      if (debug){ std::cout << "Grid is fully Collapsed!\n"; }
       return;
    }
 
@@ -199,9 +220,9 @@ void Grid::update(){
             // find all possibilites from union (bitwise |=) of all individual possibilities
             newPossibilities |= right;
 
-            // if (newPossibilities.count()==0){
-            //    std::cout << "Problem Here?" << std::endl;
-            // }
+            if (debug && newPossibilities.count()==0){
+               std::cout << "Problem Here?" << std::endl;
+            }
          }         
 
          std::size_t oldCount=nearBitset.count(), newCount;
@@ -257,13 +278,15 @@ void Grid::draw(){
       }
    }
 
-   // for (int i=0; i<gridHeight; i++){
-   //    DrawLine(0.0f, static_cast<float>(i*tileScaled), gridWidth*tileScaled, static_cast<float>(i*tileScaled), RED);
-   // }   
+   if (debug){
+      for (int i=0; i<gridHeight; i++){
+         DrawLine(0.0f, static_cast<float>(i*tileScaled), gridWidth*tileScaled, static_cast<float>(i*tileScaled), RED);
+      }   
 
-   // for (int i=0; i<gridWidth; i++){
-   //    DrawLine(static_cast<float>(i*tileScaled), 0.0f, static_cast<float>(i*tileScaled), gridWidth*tileScaled, RED);
-   // }
+      for (int i=0; i<gridWidth; i++){
+         DrawLine(static_cast<float>(i*tileScaled), 0.0f, static_cast<float>(i*tileScaled), gridWidth*tileScaled, RED);
+      }
+   }
    
 }
 

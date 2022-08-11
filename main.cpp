@@ -19,9 +19,10 @@ int main(){
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        //if (IsKeyDown(KEY_SPACE)){ grid.update(); }
-        grid.update();
         grid.draw();
+        grid.update();
+
+        if (grid.collapsed){ grid.reset(); }
 
         EndDrawing();
     }
