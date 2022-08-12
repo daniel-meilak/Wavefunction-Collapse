@@ -15,10 +15,8 @@
 #include"globals.h"
 #include"point.h"
 
-// map of tile index to bitset e.g. {0,1}->[0001]
+// map of tile index <-> bitset e.g. {0,1}<->[0001]
 std::map<tileState, Bitset> getBitset;
-
-// map of bitset to tile index
 std::unordered_map<Bitset,tileState> getTile;
 
 // map of tile to left-right connection
@@ -37,13 +35,9 @@ std::size_t uniqueTiles;
 // read information on tileset from file
 // tile properties are represented in braket notation int the file {a,b}. a=tile index, b=orientation
 // for fast calculations, this will be converted into a unique bitset for each tile e.g. {0,0}->0001
-void analyzeTiles(std::string filename){
+void analyzeTiles(const std::string& filename){
 
    std::ifstream dataFile(filename);
-   if (!dataFile.is_open()){
-      std::cerr << "Could not open tile connections file " << filename << std::endl;
-      std::exit(EXIT_FAILURE);
-   }
 
    // regex matching "{a,b}", returning a,b as submatches
    std::regex tileIndices("\\{(\\d+)\\,(\\d+)\\}");
@@ -161,6 +155,41 @@ void analyzeTiles(std::string filename){
       }
    }
 }
+
+// void analyzaWangTile(const std::string& filename){
+
+//    // load image
+//    Image tilesetImage = LoadImage(filename.c_str());
+
+//    // load colour array from image
+//    Color* tilesetColors = LoadImageColors(tilesetImage);
+
+//    // get number of tiles
+//    int nTiles = tilesetImage.width/tileSize;
+
+//    // create 3D vector to hold all border data. nTiles x 4 borders x tileSize
+//    std::vector<std::vector<std::vector<Color>>> tileBorderData(nTiles,std::vector<std::vector<Color>>(4,std::vector<Color>(tileSize)));
+
+//    // fill tileBorderData
+//    for (std::size_t i=0; i<tilesetImage.width*tilesetImage.height; i+=tileArea){
+
+//       std::size_t j=i/(tileSize*tileSize);
+      
+//       // fill all borders (bottom and left are reversed for consistency)
+//       for (std::size_t k=0, rightOffset=tileSize-1; k<tileSize; k++){
+//          tileBorderData[j][0][k] = tilesetColors[i + k];
+//          tileBorderData[j][1][k] = tilesetColors[i + rightOffset + k*tileSize];
+//          tileBorderData[j][2][k] = tilesetColors[i + (tileArea-1) - (rightOffset + k*tileSize)];
+//          tileBorderData[j][3][k] = tilesetColors[i + (tileArea-1) - k];
+//       }
+//    }
+
+
+
+//    // unload image and colours
+//    UnloadImage(tilesetImage);
+//    UnloadImageColors(tilesetColors);
+// }
 
 // rotate a unique tile clockwise. n: 0-0deg, 1-90deg, 2-180deg, 3-270deg
 void rotate(Bitset& tile, int n, bool clockwise){

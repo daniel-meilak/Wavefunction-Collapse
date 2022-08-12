@@ -39,7 +39,11 @@ struct ButtonHold : ButtonBase{
       bounds = {x, y, source.width*scale, source.height*scale};
    };
 
+   // display at current bounds
    bool display();
+
+   // display at new coordinate
+   bool display_at(float x, float y);
 };
 
 bool ButtonHold::display(){
@@ -73,6 +77,16 @@ bool ButtonHold::display(){
 
    return clicked;
 }
+
+bool ButtonHold::display_at(float x, float y){
+
+   bounds.x = x;
+   bounds.y = y;
+
+   return display();
+}
+
+
 
 //---------------------------------------
 // Button which changes Icon

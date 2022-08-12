@@ -1,7 +1,9 @@
 #pragma once
 
 #include<filesystem>
+#include<iterator>
 #include<string>
+#include<unordered_set>
 #include<vector>
 
 #include"button.h"
@@ -107,7 +109,7 @@ void SectionRange::move(float x, float y){
 }
 
 //---------------------------------------------------------------------------
-// Section that is fully covered by a button. Static message. Runs function
+// Section that is fully covered by a button. Static message. Runs Grid::function
 //---------------------------------------------------------------------------
 struct SectionBasicButton : SectionBase {
 
@@ -228,7 +230,7 @@ struct SectionTiles : SectionBase {
    Font& font{fontStore.add("fonts/alpha_beta.png")};
 
    // message properties
-   std::string tilesetFile;
+   std::string& tilesetName;
    Vector2 messagePos;
    float fontSize{font.baseSize*1.4f};
    float spacing{1.0f};
@@ -256,16 +258,20 @@ struct SectionTiles : SectionBase {
    // tileset select drop down button
    ButtonHold dropDown{textureStore.add("UI/tile-menu-arrow.png"), 106.0f*scale, 9.0f*scale, scale};
    
+   // tileset select drop down options
+   std::vector<ButtonHold> dropDownOptions;
+   ButtonHold dropDownBack{dropTexture,0.0f,0.0f,scale};
+
    // weights
    std::vector<int>& weights;
 
    // list of tileset files
-   std::vector<std::string> tilesets;
+   std::unordered_set<std::string> tilesets;
 
    // bool for showing drop down menu
    bool dropDownEnabled{false};
 
-   SectionTiles(float x, float y, std::string filename, std::vector<int>& weights, float& scale);
+   SectionTiles(float x, float y, std::string& tilesetName, std::vector<int>& weights, float& scale);
 
    void display() override;
 
@@ -274,8 +280,8 @@ struct SectionTiles : SectionBase {
    void showDropDown();
 };
 
-SectionTiles::SectionTiles(float x, float y, std::string filename, std::vector<int>& weights, float& scale):
-   SectionBase(scale), weights(weights){
+SectionTiles::SectionTiles(float x, float y, std::string& tilesetName, std::vector<int>& weights, float& scale):
+   SectionBase(scale), tilesetName(tilesetName), weights(weights){
 
    // move all components
    move(x,y);
@@ -284,16 +290,13 @@ SectionTiles::SectionTiles(float x, float y, std::string filename, std::vector<i
    bounds = {topBounds.x, topBounds.y, topBounds.width, topBounds.height+botBounds.height};
 
    // set starting tileset filename and position
-   std::filesystem::path p{filename};
-   tilesetFile = p.filename().string();
-   Vector2 textSize = MeasureTextEx(font, tilesetFile.c_str(), fontSize, spacing);
+   Vector2 textSize = MeasureTextEx(font, tilesetName.c_str(), fontSize, spacing);
    messagePos = {topBounds.x + 0.1f*topBounds.width, topBounds.y + 0.5f*topBounds.height - textSize.y*0.5f};
 
-   // create list of tilesets in tileset directory
-   for (const auto& entry : std::filesystem::directory_iterator(tilesetDir)){
-      if (entry.path().extension() == ".png"){ tilesets.push_back(entry.path().filename().string()); }
+   // create tileset buttons in drop down
+   for (const auto& entry : std::filesystem::directory_iterator(tilesetBaseDir)){
+      tilesets.insert((*std::next(entry.path().begin())).string());
    }
-
 }
 
 void SectionTiles::display(){
@@ -306,7 +309,7 @@ void SectionTiles::display(){
    if (dropDown.display()){ dropDownEnabled = !dropDownEnabled; }
 
    // display tileset file
-   DrawTextEx(font, tilesetFile.c_str(), messagePos, fontSize, spacing, WHITE);
+   DrawTextEx(font, tilesetName.c_str(), messagePos, fontSize, spacing, WHITE);
 
    // show drop down if enabled
    if (dropDownEnabled){ showDropDown(); }
@@ -328,6 +331,9 @@ void SectionTiles::move(float x, float y){
 
 void SectionTiles::showDropDown(){
 
+   // check for change in tileset
+   std::string newTileset;
+
    float startX{bounds.x + topBounds.width*8.0f/128};
    float startY{bounds.y + topBounds.height*23.0f/32};
    Vector2 pathPos{messagePos};
@@ -335,8 +341,11 @@ void SectionTiles::showDropDown(){
 
    for (const auto& entry : tilesets){
 
-      // draw background
-      DrawTexturePro(dropTexture, dropSource, {startX,startY,dropBounds.width,dropBounds.height}, {}, 0.0f, WHITE);
+      // skip current tileset
+      if (entry == tilesetDir){ continue; }
+
+      // draw background button and check for click
+      if (dropDownBack.display_at(startX,startY)){ newTileset = entry; };
       startY += dropBounds.height;
 
       // draw text
@@ -344,5 +353,12 @@ void SectionTiles::showDropDown(){
       pathPos.y += dropBounds.height;
    }
 
+   // draw line at bottom of drop down
    DrawTexturePro(endTexture, endSource, {startX,startY,endBounds.width,endBounds.height}, {}, 0.0f, WHITE);
+
+   // on click, swap tileset and reset grid
+   if (!newTileset.empty()){
+      dropDownEnabled = false;
+      tilesetName = newTileset;
+   }
 }
