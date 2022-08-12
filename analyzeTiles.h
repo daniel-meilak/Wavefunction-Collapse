@@ -15,6 +15,12 @@
 #include"globals.h"
 #include"point.h"
 
+// rotatability of current tileset
+bool rotatable{true};
+
+// index lookup for non rotating tilesets
+std::unordered_map<int,int> nonRotatingIndex;
+
 // map of tile index <-> bitset e.g. {0,1}<->[0001]
 std::map<tileState, Bitset> getBitset;
 std::unordered_map<Bitset,tileState> getTile;
@@ -42,8 +48,14 @@ void analyzeTiles(const std::string& filename){
    // regex matching "{a,b}", returning a,b as submatches
    std::regex tileIndices("\\{(\\d+)\\,(\\d+)\\}");
 
-   // create list of tiles in braket {a,b} and bitset (00010) form 
    std::string line;
+
+   // check for tileset rotatability
+   std::getline(dataFile,line);
+   if (line=="no rotation"){ rotatable = false; }
+   std::getline(dataFile,line);
+
+   // create list of tiles in braket {a,b} and bitset (00010) form 
    int id{0};
    std::size_t index{0};
    std::getline(dataFile,line);
@@ -57,7 +69,11 @@ void analyzeTiles(const std::string& filename){
       std::vector<tileState> brackets{{id,0},{id,1},{id,2},{id,3}};
       std::vector<Bitset> bits{(1ull<<index),(1ull<<(index+1)),(1ull<<(index+2)),(1ull<<(index+3))};
       
+      // get symmetry {Sym,_}
       int symmetry = std::stoi(i->str(1));
+
+      // save non rotating index if needed
+      if (!rotatable){ nonRotatingIndex[id] = index; }
 
       for (int j=0; j<symmetry; j++){
          
