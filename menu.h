@@ -172,9 +172,5 @@ public:
       menus.push_back(std::move(tileMenu));
    };
 
-   // MenuControl(std::unique_ptr<MenuHorizontal>&& controlMenu){
-   //    menus.push_back(std::move(controlMenu));
-   // };
-
    void display(){ for (auto& menu : menus){ menu->display(); } };
 };

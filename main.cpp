@@ -13,13 +13,13 @@ int main(){
 
     InitWindow(screenWidth, screenHeight, "Wavefunction Collapse"); 
 
-    // create grid with tieset and data sheet
-    Grid grid(textureStore.add(tilesetFile), tilesetDataFile);
+    // create grid with tileset and data sheet
+    Grid grid(tilesetDir);
 
     // create controlls and tile select menu
     MenuControl menus(
-        createControlsMenu(screenWidth*0.5f, screenHeight*0.87f, grid, Grid::reset, grid.running, grid.updateSpeed),
-        createTilesMenu(10.0f, 10.0f, tilesetFile, weights)
+        createControlsMenu(screenWidth-700.0f, screenHeight-105.0f, grid, Grid::reset, grid.running, grid.updateSpeed),
+        createTilesMenu(10.0f, 10.0f, tilesetDir, weights)
     );
 
     SetTargetFPS(fps);
@@ -34,11 +34,14 @@ int main(){
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
+        // draw grid and menu
         grid.draw();
         menus.display();
 
+        // collapse next grid position
         grid.update();
 
+        // reset on completion
         if (grid.collapsed){ grid.reset(); }
 
         EndDrawing();

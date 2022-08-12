@@ -4,6 +4,7 @@
 #include<bitset>
 #include<climits>
 #include<cstddef>
+#include<filesystem>
 #include<iterator>
 #include<map>
 #include<queue>
@@ -17,6 +18,8 @@
 
 #include"analyzeTiles.h"
 #include"globals.h"
+#include"storage.h"
+#include"utils.h"
 
 struct Tile{
    Texture2D& texture;
@@ -52,7 +55,7 @@ struct Grid{
    bool collapsed{false};
 
    // construct grid. Add texture ref to tiles, set up random number gen, choose initial starting point
-   Grid(Texture2D& texture, std::string dataSheet);
+   Grid(const std::string& tilesetDir);
 
    // debugging tileset analysis. Shows left<->right connections for each unique tile
    void debugTileset();
@@ -82,10 +85,12 @@ void Grid::resetEntropy(){
    }
 }
 
-Grid::Grid(Texture2D& texture, std::string dataSheet = ""): texture(texture){
+Grid::Grid(const std::string& tilesetDir): texture(textureStore.add(pathToTexture(tilesetDir))){
+
+   std::string dataSheet = pathToData(tilesetDir);
 
    // analyze tileset data if dataSheet is provided
-   if (!dataSheet.empty()){ analyzeTiles(dataSheet); }
+   if (std::filesystem::exists(dataSheet)){ analyzeTiles(dataSheet); }
    // automatically work out tileset connections for WANG tilesets
    // else { analyzeWANG(texture); }
 
@@ -123,6 +128,16 @@ void Grid::update(){
 
    // reset time since last update
    sinceLastUpdate=0.0f;
+
+   // debug tileset
+   if (debug){
+      debugTileset();
+
+      // set grid speed back to zero
+      updateSpeed = 0;
+
+      return;
+   }
 
    //------------------------------
    // collapse a tile
