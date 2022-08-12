@@ -365,6 +365,6 @@ void SectionTiles::showDropDown(){
       dropDownEnabled = false;
       tilesetName = newTileset;
 
-      changeTileset(pathToTexture(tilesetName), grid);
+      changeTileset(tilesetName, grid);
    }
 }

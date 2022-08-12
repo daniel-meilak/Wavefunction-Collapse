@@ -372,10 +372,10 @@ void changeTileset(const std::string& newTileset, Grid& grid){
    uniqueTiles = 0;
 
    // analyze tileset
-   analyzeTiles(newTileset);
+   analyzeTiles(pathToData(newTileset));
 
    // change grid texture pointer
-   grid.texture = textureStore.getPtr(newTileset);
+   grid.texture = textureStore.getPtr(pathToTexture(newTileset));
 
    // reset grid
    grid.reset();
