@@ -151,11 +151,11 @@ std::unique_ptr<MenuHorizontal> createControlsMenu(float x, float y, Grid& grid,
    return menu;
 }
 
-std::unique_ptr<MenuVertical> createTilesMenu(float x, float y, std::string& filename, std::vector<int>& weights){
+std::unique_ptr<MenuVertical> createTilesMenu(float x, float y, std::string& filename, std::vector<int>& weights, Grid& grid){
 
    auto menu = std::make_unique<MenuVertical>(Vector2{x,y});
 
-   menu->addSection<SectionTiles>(filename, weights);
+   menu->addSection<SectionTiles>(filename, weights, grid);
 
    return menu;
 }

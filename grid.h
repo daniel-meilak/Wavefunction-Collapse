@@ -80,12 +80,8 @@ void Grid::resetEntropy(){
 
 Grid::Grid(const std::string& tilesetDir): texture(textureStore.getPtr(pathToTexture(tilesetDir))){
 
-   std::string dataSheet = pathToData(tilesetDir);
-
-   // analyze tileset data if dataSheet is provided
-   if (std::filesystem::exists(dataSheet)){ analyzeTiles(dataSheet); }
-   // automatically work out tileset connections for WANG tilesets
-   // else { analyzeWANG(texture); }
+   // analyze tileset data
+   analyzeTiles(pathToData(tilesetDir));
 
    bitsetGrid = std::vector<std::vector<Bitset>>(gridHeight,std::vector<Bitset>(gridWidth,Bitset(std::string(uniqueTiles,'1'))));
    tileGrid = std::vector<std::vector<tileState>>(gridHeight, std::vector<tileState>(gridWidth));
@@ -357,4 +353,30 @@ void Grid::debugTileset(){
    }
 
    it++;
+}
+
+//--------------------------------------------
+// analyze new tileset, reset grid
+//--------------------------------------------
+void changeTileset(const std::string& newTileset, Grid& grid){
+
+   // reset global data
+   rotatable = true;
+   nonRotatingIndex.clear();
+   getBitset.clear();
+   getTile.clear();
+   connectsTo.clear();
+   rightRotation.clear();
+   leftRotation.clear();
+   weights.clear();
+   uniqueTiles = 0;
+
+   // analyze tileset
+   analyzeTiles(newTileset);
+
+   // change grid texture pointer
+   grid.texture = textureStore.getPtr(newTileset);
+
+   // reset grid
+   grid.reset();
 }

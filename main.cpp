@@ -19,7 +19,7 @@ int main(){
     // create controlls and tile select menu
     MenuControl menus(
         createControlsMenu(screenWidth-700.0f, screenHeight-105.0f, grid, Grid::reset, grid.running, grid.updateSpeed),
-        createTilesMenu(10.0f, 10.0f, tilesetDir, weights)
+        createTilesMenu(10.0f, 10.0f, tilesetDir, weights, grid)
     );
 
     SetTargetFPS(fps);

@@ -10,6 +10,7 @@
 #include"globals.h"
 #include"grid.h"
 #include"storage.h"
+#include"utils.h"
 
 //------------------------
 // Base class of section
@@ -268,10 +269,13 @@ struct SectionTiles : SectionBase {
    // list of tileset files
    std::unordered_set<std::string> tilesets;
 
+   // grid to control
+   Grid& grid;
+
    // bool for showing drop down menu
    bool dropDownEnabled{false};
 
-   SectionTiles(float x, float y, std::string& tilesetName, std::vector<int>& weights, float& scale);
+   SectionTiles(float x, float y, std::string& tilesetName, std::vector<int>& weights, Grid& grid, float& scale);
 
    void display() override;
 
@@ -280,8 +284,8 @@ struct SectionTiles : SectionBase {
    void showDropDown();
 };
 
-SectionTiles::SectionTiles(float x, float y, std::string& tilesetName, std::vector<int>& weights, float& scale):
-   SectionBase(scale), tilesetName(tilesetName), weights(weights){
+SectionTiles::SectionTiles(float x, float y, std::string& tilesetName, std::vector<int>& weights, Grid& grid, float& scale):
+   SectionBase(scale), tilesetName(tilesetName), weights(weights), grid(grid){
 
    // move all components
    move(x,y);
@@ -360,5 +364,7 @@ void SectionTiles::showDropDown(){
    if (!newTileset.empty()){
       dropDownEnabled = false;
       tilesetName = newTileset;
+
+      changeTileset(pathToTexture(tilesetName), grid);
    }
 }
