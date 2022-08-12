@@ -2,6 +2,7 @@
 
 #include<array>
 #include<cstdlib>
+#include<filesystem>
 #include<iostream>
 #include<string>
 #include<type_traits>
@@ -41,6 +42,12 @@ Texture2D& Storage<Texture2D>::getRef(std::string filename){
    // else add new texture
    else{
 
+      // check if path exists
+      if (!std::filesystem::exists(filename)){
+         std::cerr << "Texture file path \"" << filename << "\" is not valid.\n";
+         std::exit(EXIT_FAILURE);
+      }
+
       // increment texture index and check if limit reached
       if (static_cast<size_t>(++index) == textures.size()){
          std::cerr << "Texture storage limit reached. Cannot load \"" << filename << "\".\n";
@@ -65,6 +72,12 @@ Texture2D* Storage<Texture2D>::getPtr(std::string filename){
    }
    // else add new texture
    else{
+
+      // check if path exists
+      if (!std::filesystem::exists(filename)){
+         std::cerr << "Texture file path \"" << filename << "\" is not valid.\n";
+         std::exit(EXIT_FAILURE);
+      }
 
       // increment texture index and check if limit reached
       if (static_cast<size_t>(++index) == textures.size()){
@@ -100,6 +113,12 @@ Font& Storage<Font>::getRef(std::string filename){
    }
    // else add new texture
    else{
+
+      // check if path exists
+      if (!std::filesystem::exists(filename)){
+         std::cerr << "Font file path \"" << filename << "\" is not valid.\n";
+         std::exit(EXIT_FAILURE);
+      }
 
       // increment texture index and check if limit reached
       if (static_cast<size_t>(++index) == textures.size()){
