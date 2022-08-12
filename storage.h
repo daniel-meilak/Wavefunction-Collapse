@@ -12,7 +12,7 @@
 template <typename T>
 struct Storage{
    
-   T& add(const char* filename);
+   T& add(std::string filename);
 
    void unloadAll();
 
@@ -31,7 +31,7 @@ Storage<Font> fontStore;
 
 // Texture Storage
 template<>
-Texture2D& Storage<Texture2D>::add(const char* filename){
+Texture2D& Storage<Texture2D>::add(std::string filename){
 
    // check if texture is already loaded
    if (textureIndex.contains(filename)){
@@ -46,7 +46,7 @@ Texture2D& Storage<Texture2D>::add(const char* filename){
          std::exit(EXIT_FAILURE);
       }
 
-      textures[index] = LoadTexture(filename);
+      textures[index] = LoadTexture(filename.c_str());
 
       // add to uniqueTextures in case of future requests
       textureIndex[filename] = index;
@@ -66,7 +66,7 @@ void Storage<Texture2D>::unloadAll(){
 
 // Font Storage
 template<>
-Font& Storage<Font>::add(const char* filename){
+Font& Storage<Font>::add(std::string filename){
 
    // check if texture is already loaded
    if (textureIndex.contains(filename)){
@@ -81,7 +81,7 @@ Font& Storage<Font>::add(const char* filename){
          std::exit(EXIT_FAILURE);
       }
 
-      textures[index] = LoadFont(filename);
+      textures[index] = LoadFont(filename.c_str());
 
       // add to uniqueTextures in case of future requests
       textureIndex[filename] = index;

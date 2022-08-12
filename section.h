@@ -235,13 +235,23 @@ struct SectionTiles : SectionBase {
 
    // tilset selection background
    Texture2D& topTexture{textureStore.add("UI/tile-menu-top.png")};
-   Rectangle topSource{0.0f,0.0f,static_cast<float>(topTexture.width),static_cast<float>(topTexture.height)};
-   Rectangle topBounds{0.0f,0.0f,topSource.width*scale,topSource.height*scale};
+   Rectangle  topSource{0.0f,0.0f,static_cast<float>(topTexture.width),static_cast<float>(topTexture.height)};
+   Rectangle  topBounds{0.0f,0.0f,topSource.width*scale,topSource.height*scale};
 
    // individual tile selection background
    Texture2D& botTexture{textureStore.add("UI/tile-menu-bot.png")};
-   Rectangle botSource{0.0f,0.0f,static_cast<float>(botTexture.width),static_cast<float>(botTexture.height)};
-   Rectangle botBounds{0.0f,topBounds.height,botSource.width*scale,botSource.height*scale};
+   Rectangle  botSource{0.0f,0.0f,static_cast<float>(botTexture.width),static_cast<float>(botTexture.height)};
+   Rectangle  botBounds{0.0f,topBounds.height,botSource.width*scale,botSource.height*scale};
+
+   // drop down background
+   Texture2D& dropTexture{textureStore.add("UI/tile-menu-drop.png")};
+   Rectangle  dropSource{0.0f,0.0f,static_cast<float>(dropTexture.width),static_cast<float>(dropTexture.height)};
+   Rectangle  dropBounds{0.0f,0.0f,dropSource.width*scale,dropSource.height*scale};
+
+   // drop down end
+   Texture2D& endTexture{textureStore.add("UI/tile-menu-end.png")};
+   Rectangle  endSource{0.0f,0.0f,static_cast<float>(endTexture.width),static_cast<float>(endTexture.height)};
+   Rectangle  endBounds{0.0f,0.0f,endSource.width*scale,endSource.height*scale};
 
    // tileset select drop down button
    ButtonHold dropDown{textureStore.add("UI/tile-menu-arrow.png"), 106.0f*scale, 9.0f*scale, scale};
@@ -249,11 +259,19 @@ struct SectionTiles : SectionBase {
    // weights
    std::vector<int>& weights;
 
+   // list of tileset files
+   std::vector<std::string> tilesets;
+
+   // bool for showing drop down menu
+   bool dropDownEnabled{false};
+
    SectionTiles(float x, float y, std::string filename, std::vector<int>& weights, float& scale);
 
    void display() override;
 
    void move(float x, float y);
+
+   void showDropDown();
 };
 
 SectionTiles::SectionTiles(float x, float y, std::string filename, std::vector<int>& weights, float& scale):
@@ -271,6 +289,11 @@ SectionTiles::SectionTiles(float x, float y, std::string filename, std::vector<i
    Vector2 textSize = MeasureTextEx(font, tilesetFile.c_str(), fontSize, spacing);
    messagePos = {topBounds.x + 0.1f*topBounds.width, topBounds.y + 0.5f*topBounds.height - textSize.y*0.5f};
 
+   // create list of tilesets in tileset directory
+   for (const auto& entry : std::filesystem::directory_iterator(tilesetDir)){
+      if (entry.path().extension() == ".png"){ tilesets.push_back(entry.path().filename().string()); }
+   }
+
 }
 
 void SectionTiles::display(){
@@ -280,10 +303,13 @@ void SectionTiles::display(){
    DrawTexturePro(botTexture, botSource, botBounds, {}, 0.0f, WHITE);
 
    // display drop down button
-   if (dropDown.display()){};
+   if (dropDown.display()){ dropDownEnabled = !dropDownEnabled; }
 
    // display tileset file
    DrawTextEx(font, tilesetFile.c_str(), messagePos, fontSize, spacing, WHITE);
+
+   // show drop down if enabled
+   if (dropDownEnabled){ showDropDown(); }
 }
 
 void SectionTiles::move(float x, float y){
@@ -298,4 +324,25 @@ void SectionTiles::move(float x, float y){
    botBounds.y += trans.y;
    dropDown.bounds.x += trans.x;
    dropDown.bounds.y += trans.y;
+}
+
+void SectionTiles::showDropDown(){
+
+   float startX{bounds.x + topBounds.width*8.0f/128};
+   float startY{bounds.y + topBounds.height*23.0f/32};
+   Vector2 pathPos{messagePos};
+   pathPos.y += dropBounds.height;
+
+   for (const auto& entry : tilesets){
+
+      // draw background
+      DrawTexturePro(dropTexture, dropSource, {startX,startY,dropBounds.width,dropBounds.height}, {}, 0.0f, WHITE);
+      startY += dropBounds.height;
+
+      // draw text
+      DrawTextEx(font, entry.c_str(), pathPos, fontSize, spacing, WHITE);
+      pathPos.y += dropBounds.height;
+   }
+
+   DrawTexturePro(endTexture, endSource, {startX,startY,endBounds.width,endBounds.height}, {}, 0.0f, WHITE);
 }

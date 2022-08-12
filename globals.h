@@ -3,6 +3,7 @@
 #include<array>
 #include<bitset>
 #include<cstddef>
+#include<string_view>
 #include<utility>
 
 #include"point.h"
@@ -40,6 +41,9 @@ constexpr std::array<Point,4> cardinals{Point(1,0),Point(0,1),Point(-1,0),Point(
 // Textures
 constexpr int maxTextures{50};
 
+// tileset directory
+constexpr std::string_view tilesetDir{"tilesets"};
+
 // debug
 constexpr bool debug{false};
 
@@ -56,3 +60,6 @@ Vector2 mousePos{};
 // elapsed time since last update
 float sinceLastUpdate{};
 
+// selected tileset & data
+std::string tilesetFile{"tilesets/circuit.png"};
+std::string tilesetDataFile{"tilesets/circuit_data.txt"};

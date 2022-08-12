@@ -14,12 +14,12 @@ int main(){
     InitWindow(screenWidth, screenHeight, "Wavefunction Collapse"); 
 
     // create grid with tieset and data sheet
-    Grid grid(textureStore.add("tilesets/circuit.png"), "tilesets/circuit_data.txt");
+    Grid grid(textureStore.add(tilesetFile), tilesetDataFile);
 
     // create controlls and tile select menu
     MenuControl menus(
-        createControlsMenu(screenWidth*0.5f, screenHeight*0.87f, grid, Grid::reset, grid.running, grid.updateSpeed)//,
-        //createTilesMenu(10.0f, 10.0f, weights)
+        createControlsMenu(screenWidth*0.5f, screenHeight*0.87f, grid, Grid::reset, grid.running, grid.updateSpeed),
+        createTilesMenu(10.0f, 10.0f, tilesetFile, weights)
     );
 
     SetTargetFPS(fps);

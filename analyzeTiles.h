@@ -174,3 +174,4 @@ void rotate(Bitset& tile, int n, bool clockwise){
       std::exit(EXIT_FAILURE);
    }
 }
+

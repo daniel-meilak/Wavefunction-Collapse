@@ -151,11 +151,11 @@ std::unique_ptr<MenuHorizontal> createControlsMenu(float x, float y, Grid& grid,
    return menu;
 }
 
-std::unique_ptr<MenuVertical> createTilesMenu(float x, float y, std::vector<int>& weights){
+std::unique_ptr<MenuVertical> createTilesMenu(float x, float y, std::string& filename, std::vector<int>& weights){
 
    auto menu = std::make_unique<MenuVertical>(Vector2{x,y});
 
-   menu->addSection<SectionTiles>("UI/rectangle-sheet.png", weights);
+   menu->addSection<SectionTiles>(filename, weights);
 
    return menu;
 }
@@ -167,14 +167,14 @@ class MenuControl{
    std::vector<std::unique_ptr<MenuBase>> menus;
 
 public:
-   // MenuControl(std::unique_ptr<MenuHorizontal>&& controlMenu, std::unique_ptr<MenuVertical>&& tileMenu){
-   //    menus.push_back(std::move(controlMenu));
-   //    menus.push_back(std::move(tileMenu));
-   // };
-
-   MenuControl(std::unique_ptr<MenuHorizontal>&& controlMenu){
+   MenuControl(std::unique_ptr<MenuHorizontal>&& controlMenu, std::unique_ptr<MenuVertical>&& tileMenu){
       menus.push_back(std::move(controlMenu));
+      menus.push_back(std::move(tileMenu));
    };
+
+   // MenuControl(std::unique_ptr<MenuHorizontal>&& controlMenu){
+   //    menus.push_back(std::move(controlMenu));
+   // };
 
    void display(){ for (auto& menu : menus){ menu->display(); } };
 };
