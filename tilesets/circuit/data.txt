@@ -1,21 +1,21 @@
 rotate
 
-{1,150},{1,30},{4,3},{2,5},{4,75},{4,75},{2,30},{2,10},{4,4},{4,1},{2,20},{4,20},{2,1}
+{1,30},{1,150},{4,3},{2,5},{4,75},{4,75},{2,30},{2,10},{4,4},{4,1},{2,20},{4,20},{2,1}
 
-Chip left - {0,0}
-Silicon left - {1,0},{2,0},{2,1},{2,2},{3,0},{5,2},{5,3},{6,0},{8,1},{8,3},{9,2},{11,1},{11,2},{12,0}
+Chip left - {1,0}
+Silicon left - {0,0},{2,0},{2,1},{2,2},{3,0},{5,2},{5,3},{6,0},{8,1},{8,3},{9,2},{11,1},{11,2},{12,0}
 Green left lane - {2,3},{4,3},{6,1},{7,1},{8,2},{9,0},{9,1},{9,3},{10,0},{10,1},{11,0},{11,3},{12,1}
 Green left lane + no diag down - {2,3},{4,3},{6,1},{7,1},{8,2},{9,0},{9,1},{9,3},{10,0},{11,0},{12,1}
 Green left lane + no diag up - {2,3},{4,3},{6,1},{7,1},{8,2},{9,0},{9,1},{9,3},{10,1},{11,3},{12,1}
 Grey left lane - {3,1},{7,0},{8,0}
 Left corner bottom + Connector Down - {5,0},{4,0}
 Left corner top + Connector Up - {5,1},{4,2}
-Chip left + Connector left - {0,0},{4,1}
+Chip left + Connector left - {1,0},{4,1}
 Connector Up - {4,2}
 Connector Down - {4,0}
 
-{0,0} - Chip left + Connector left
-{1,0} - Silicon left
+{0,0} - Silicon left
+{1,0} - Chip left + Connector left
 {2,0},{2,2},{2,3} - Silicon left
 {2,1} - Green left lane
 {3,0} - Silicon left
