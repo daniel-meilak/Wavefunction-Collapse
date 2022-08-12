@@ -49,7 +49,7 @@ void MenuBase::display(){
 //----------------------------------
 struct MenuHorizontal : MenuBase{
 
-   ButtonIcon button{textureStore.add("UI/open-close-h.png"), 0.0f, 0.0f, scale, maximized};
+   ButtonIcon button{textureStore.getRef("UI/open-close-h.png"), 0.0f, 0.0f, scale, maximized};
 
    MenuHorizontal(Vector2 pos): MenuBase(pos){};
 
@@ -94,7 +94,7 @@ void MenuHorizontal::addSection(Ts&&... args){
 //----------------------------------
 struct MenuVertical : MenuBase{
 
-   ButtonIcon button{textureStore.add("UI/open-close-v.png"), 0.0f, 0.0f, scale, maximized};
+   ButtonIcon button{textureStore.getRef("UI/open-close-v.png"), 0.0f, 0.0f, scale, maximized};
 
    MenuVertical(Vector2 pos): MenuBase(pos){};
 

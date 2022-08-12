@@ -36,7 +36,7 @@ struct SectionBase{
 struct SectionRange : SectionBase {
 
    // alpha_beta font by Brian Kent (AEnigma)
-   Font& font{fontStore.add("fonts/alpha_beta.png")};
+   Font& font{fontStore.getRef("fonts/alpha_beta.png")};
 
    // Texture
    Texture2D& texture;
@@ -52,8 +52,8 @@ struct SectionRange : SectionBase {
    int& variable;
 
    // associated buttons
-   ButtonHold leftButton{textureStore.add("UI/left-arrow.png"), 0.0f, 0.0f, scale, true};
-   ButtonHold rightButton{textureStore.add("UI/right-arrow.png"), 0.0f, 0.0f, scale, true};
+   ButtonHold leftButton{textureStore.getRef("UI/left-arrow.png"), 0.0f, 0.0f, scale, true};
+   ButtonHold rightButton{textureStore.getRef("UI/right-arrow.png"), 0.0f, 0.0f, scale, true};
 
    SectionRange(float x, float y, std::string filename, std::string message, int& variable, float& scale);
 
@@ -63,7 +63,7 @@ struct SectionRange : SectionBase {
 };
 
 SectionRange::SectionRange(float x, float y, std::string filename, std::string message, int& variable, float& scale):
-   SectionBase(scale), texture(textureStore.add(filename.c_str())), message(message), variable(variable){
+   SectionBase(scale), texture(textureStore.getRef(filename.c_str())), message(message), variable(variable){
       
       // set scaling
       bounds.width = source.width*scale;
@@ -114,7 +114,7 @@ void SectionRange::move(float x, float y){
 struct SectionBasicButton : SectionBase {
 
    // alpha_beta font by Brian Kent (AEnigma)
-   Font& font{fontStore.add("fonts/alpha_beta.png")};
+   Font& font{fontStore.getRef("fonts/alpha_beta.png")};
 
    Texture2D& texture;
 
@@ -141,7 +141,7 @@ struct SectionBasicButton : SectionBase {
 };
 
 SectionBasicButton::SectionBasicButton(float x, float y, std::string filename, std::string message, Grid& grid, std::function<void(Grid&)> func, float& scale):
-   SectionBase(scale), texture(textureStore.add(filename.c_str())), message(message), grid(grid), func(func){
+   SectionBase(scale), texture(textureStore.getRef(filename.c_str())), message(message), grid(grid), func(func){
       
       bounds = {x, y,texture.width*scale/3.0f, texture.height*scale};
 
@@ -197,7 +197,7 @@ struct SectionBoolIcon : SectionBase {
 };
 
 SectionBoolIcon::SectionBoolIcon(float x, float y, std::string filename, bool& variable, float& scale):
-   SectionBase(scale), texture(textureStore.add(filename.c_str())), variable(variable){
+   SectionBase(scale), texture(textureStore.getRef(filename.c_str())), variable(variable){
 
       bounds = {x,y,texture.width*scale/3.0f, texture.height*scale*0.5f};
 
@@ -227,7 +227,7 @@ void SectionBoolIcon::move(float x, float y){
 struct SectionTiles : SectionBase {
 
    // alpha_beta font by Brian Kent (AEnigma)
-   Font& font{fontStore.add("fonts/alpha_beta.png")};
+   Font& font{fontStore.getRef("fonts/alpha_beta.png")};
 
    // message properties
    std::string& tilesetName;
@@ -236,27 +236,27 @@ struct SectionTiles : SectionBase {
    float spacing{1.0f};
 
    // tilset selection background
-   Texture2D& topTexture{textureStore.add("UI/tile-menu-top.png")};
+   Texture2D& topTexture{textureStore.getRef("UI/tile-menu-top.png")};
    Rectangle  topSource{0.0f,0.0f,static_cast<float>(topTexture.width),static_cast<float>(topTexture.height)};
    Rectangle  topBounds{0.0f,0.0f,topSource.width*scale,topSource.height*scale};
 
    // individual tile selection background
-   Texture2D& botTexture{textureStore.add("UI/tile-menu-bot.png")};
+   Texture2D& botTexture{textureStore.getRef("UI/tile-menu-bot.png")};
    Rectangle  botSource{0.0f,0.0f,static_cast<float>(botTexture.width),static_cast<float>(botTexture.height)};
    Rectangle  botBounds{0.0f,topBounds.height,botSource.width*scale,botSource.height*scale};
 
    // drop down background
-   Texture2D& dropTexture{textureStore.add("UI/tile-menu-drop.png")};
+   Texture2D& dropTexture{textureStore.getRef("UI/tile-menu-drop.png")};
    Rectangle  dropSource{0.0f,0.0f,static_cast<float>(dropTexture.width),static_cast<float>(dropTexture.height)};
    Rectangle  dropBounds{0.0f,0.0f,dropSource.width*scale,dropSource.height*scale};
 
    // drop down end
-   Texture2D& endTexture{textureStore.add("UI/tile-menu-end.png")};
+   Texture2D& endTexture{textureStore.getRef("UI/tile-menu-end.png")};
    Rectangle  endSource{0.0f,0.0f,static_cast<float>(endTexture.width),static_cast<float>(endTexture.height)};
    Rectangle  endBounds{0.0f,0.0f,endSource.width*scale,endSource.height*scale};
 
    // tileset select drop down button
-   ButtonHold dropDown{textureStore.add("UI/tile-menu-arrow.png"), 106.0f*scale, 9.0f*scale, scale};
+   ButtonHold dropDown{textureStore.getRef("UI/tile-menu-arrow.png"), 106.0f*scale, 9.0f*scale, scale};
    
    // tileset select drop down options
    std::vector<ButtonHold> dropDownOptions;

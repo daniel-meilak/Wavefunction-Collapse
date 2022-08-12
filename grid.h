@@ -31,7 +31,7 @@ struct Tile{
 struct Grid{
 
    // tileset
-   Texture2D& texture;
+   Texture2D* texture;
 
    // bitset grid
    std::vector<std::vector<Bitset>> bitsetGrid;
@@ -85,7 +85,7 @@ void Grid::resetEntropy(){
    }
 }
 
-Grid::Grid(const std::string& tilesetDir): texture(textureStore.add(pathToTexture(tilesetDir))){
+Grid::Grid(const std::string& tilesetDir): texture(textureStore.getPtr(pathToTexture(tilesetDir))){
 
    std::string dataSheet = pathToData(tilesetDir);
 
@@ -95,7 +95,7 @@ Grid::Grid(const std::string& tilesetDir): texture(textureStore.add(pathToTextur
    // else { analyzeWANG(texture); }
 
    bitsetGrid = std::vector<std::vector<Bitset>>(gridHeight,std::vector<Bitset>(gridWidth,Bitset(std::string(uniqueTiles,'1'))));
-   tileGrid = std::vector<std::vector<Tile>>(gridHeight, std::vector<Tile>(gridWidth,Tile(texture)));
+   tileGrid = std::vector<std::vector<Tile>>(gridHeight, std::vector<Tile>(gridWidth,Tile(*texture)));
 
    std::random_device rd; // slow, high quality, random number to seed fast generator
    
@@ -109,7 +109,7 @@ void Grid::reset(){
    
    // reset Grids
    bitsetGrid = std::vector<std::vector<Bitset>>(gridHeight,std::vector<Bitset>(gridWidth,Bitset(std::string(uniqueTiles,'1'))));
-   tileGrid = std::vector<std::vector<Tile>>(gridHeight, std::vector<Tile>(gridWidth,Tile(texture)));
+   tileGrid = std::vector<std::vector<Tile>>(gridHeight, std::vector<Tile>(gridWidth,Tile(*texture)));
 
    // reset Entropy
    resetEntropy();
@@ -296,11 +296,22 @@ void Grid::draw(){
 
          const Tile& tile = tileGrid[j][i];
 
-         DrawTexturePro(texture,
-                        {static_cast<float>(tile.state.x*tileSize), 0.0f, tileSize, tileSize},
-                        {static_cast<float>(i*tileScaled+tileScaled/2.0f), static_cast<float>(j*tileScaled+tileScaled/2.0f), tileScaled, tileScaled},
-                        {tileScaled/2.0f, tileScaled/2.0f},
-                        tile.state.y*90.0f, WHITE);
+         if (rotatable){
+            DrawTexturePro(*texture,
+                           {static_cast<float>(tile.state.x*tileSize), 0.0f, tileSize, tileSize},
+                           {static_cast<float>(i*tileScaled+tileScaled/2.0f), static_cast<float>(j*tileScaled+tileScaled/2.0f), tileScaled, tileScaled},
+                           {tileScaled/2.0f, tileScaled/2.0f},
+                           tile.state.y*90.0f,
+                           WHITE);
+         }
+         else {
+            DrawTexturePro(*texture,
+                           {static_cast<float>((nonRotatingIndex[tile.state.x] + tile.state.y)*tileSize), 0.0f, tileSize, tileSize},
+                           {static_cast<float>(i*tileScaled+tileScaled/2.0f), static_cast<float>(j*tileScaled+tileScaled/2.0f), tileScaled, tileScaled},
+                           {tileScaled/2.0f, tileScaled/2.0f},
+                           0.0f,
+                           WHITE);
+         }
       }
    }
 

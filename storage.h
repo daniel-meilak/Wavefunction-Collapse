@@ -12,7 +12,8 @@
 template <typename T>
 struct Storage{
    
-   T& add(std::string filename);
+   T& getRef(std::string filename);
+   T* getPtr(std::string filename);
 
    void unloadAll();
 
@@ -31,7 +32,7 @@ Storage<Font> fontStore;
 
 // Texture Storage
 template<>
-Texture2D& Storage<Texture2D>::add(std::string filename){
+Texture2D& Storage<Texture2D>::getRef(std::string filename){
 
    // check if texture is already loaded
    if (textureIndex.contains(filename)){
@@ -56,6 +57,31 @@ Texture2D& Storage<Texture2D>::add(std::string filename){
 }
 
 template<>
+Texture2D* Storage<Texture2D>::getPtr(std::string filename){
+
+   // check if texture is already loaded
+   if (textureIndex.contains(filename)){
+      return &textures[textureIndex.at(filename)];
+   }
+   // else add new texture
+   else{
+
+      // increment texture index and check if limit reached
+      if (static_cast<size_t>(++index) == textures.size()){
+         std::cerr << "Texture storage limit reached. Cannot load \"" << filename << "\".\n";
+         std::exit(EXIT_FAILURE);
+      }
+
+      textures[index] = LoadTexture(filename.c_str());
+
+      // add to uniqueTextures in case of future requests
+      textureIndex[filename] = index;
+
+      return &textures[index];
+   }
+}
+
+template<>
 void Storage<Texture2D>::unloadAll(){
 
    for (int i=0; i<=index; i++){ 
@@ -66,7 +92,7 @@ void Storage<Texture2D>::unloadAll(){
 
 // Font Storage
 template<>
-Font& Storage<Font>::add(std::string filename){
+Font& Storage<Font>::getRef(std::string filename){
 
    // check if texture is already loaded
    if (textureIndex.contains(filename)){
