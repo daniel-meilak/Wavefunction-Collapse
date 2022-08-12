@@ -21,13 +21,6 @@
 #include"storage.h"
 #include"utils.h"
 
-struct Tile{
-   Texture2D& texture;
-   tileState state{1,0};
-
-   Tile(Texture2D& texture): texture(texture){};
-};
-
 struct Grid{
 
    // tileset
@@ -37,7 +30,7 @@ struct Grid{
    std::vector<std::vector<Bitset>> bitsetGrid;
 
    // texture grid
-   std::vector<std::vector<Tile>> tileGrid;
+   std::vector<std::vector<tileState>> tileGrid;
 
    // map of number of connections for each tile. Only keeps track of uncollapsed tiles
    std::map<std::size_t,std::unordered_set<Point>> entropyList;
@@ -95,7 +88,7 @@ Grid::Grid(const std::string& tilesetDir): texture(textureStore.getPtr(pathToTex
    // else { analyzeWANG(texture); }
 
    bitsetGrid = std::vector<std::vector<Bitset>>(gridHeight,std::vector<Bitset>(gridWidth,Bitset(std::string(uniqueTiles,'1'))));
-   tileGrid = std::vector<std::vector<Tile>>(gridHeight, std::vector<Tile>(gridWidth,Tile(*texture)));
+   tileGrid = std::vector<std::vector<tileState>>(gridHeight, std::vector<tileState>(gridWidth));
 
    std::random_device rd; // slow, high quality, random number to seed fast generator
    
@@ -109,7 +102,7 @@ void Grid::reset(){
    
    // reset Grids
    bitsetGrid = std::vector<std::vector<Bitset>>(gridHeight,std::vector<Bitset>(gridWidth,Bitset(std::string(uniqueTiles,'1'))));
-   tileGrid = std::vector<std::vector<Tile>>(gridHeight, std::vector<Tile>(gridWidth,Tile(*texture)));
+   tileGrid = std::vector<std::vector<tileState>>(gridHeight, std::vector<tileState>(gridWidth));
 
    // reset Entropy
    resetEntropy();
@@ -157,7 +150,7 @@ void Grid::update(){
 
    // aliases for convenience
    Bitset& currentBitset = bitsetGrid[currentPos.y][currentPos.x];
-   Tile& currentTile = tileGrid[currentPos.y][currentPos.x];
+   tileState& currentTile = tileGrid[currentPos.y][currentPos.x];
 
    // if there are multiple possibilities
    if (entropy!=1){
@@ -179,7 +172,7 @@ void Grid::update(){
    }
 
    // get tile configuration 
-   currentTile.state = getTile[currentBitset];
+   currentTile = getTile[currentBitset];
 
    // remove from entropyList (only keep uncollapsed tiles)
    tiles.erase(currentPos);
@@ -294,19 +287,19 @@ void Grid::draw(){
    for (int j=0; j<gridHeight; j++){
       for (int i=0; i<gridWidth; i++){
 
-         const Tile& tile = tileGrid[j][i];
+         const tileState& tile = tileGrid[j][i];
 
          if (rotatable){
             DrawTexturePro(*texture,
-                           {static_cast<float>(tile.state.x*tileSize), 0.0f, tileSize, tileSize},
+                           {static_cast<float>(tile.x*tileSize), 0.0f, tileSize, tileSize},
                            {static_cast<float>(i*tileScaled+tileScaled/2.0f), static_cast<float>(j*tileScaled+tileScaled/2.0f), tileScaled, tileScaled},
                            {tileScaled/2.0f, tileScaled/2.0f},
-                           tile.state.y*90.0f,
+                           tile.y*90.0f,
                            WHITE);
          }
          else {
             DrawTexturePro(*texture,
-                           {static_cast<float>((nonRotatingIndex[tile.state.x] + tile.state.y)*tileSize), 0.0f, tileSize, tileSize},
+                           {static_cast<float>((nonRotatingIndex[tile.x] + tile.y)*tileSize), 0.0f, tileSize, tileSize},
                            {static_cast<float>(i*tileScaled+tileScaled/2.0f), static_cast<float>(j*tileScaled+tileScaled/2.0f), tileScaled, tileScaled},
                            {tileScaled/2.0f, tileScaled/2.0f},
                            0.0f,
@@ -343,7 +336,7 @@ void Grid::debugTileset(){
    reset();
 
    // set {0,0} to a unique tile
-   tileGrid[0][0].state = state;
+   tileGrid[0][0] = state;
 
    // display all left<->right connections to current state
    Bitset connections = connectsTo[bitset];
@@ -360,7 +353,7 @@ void Grid::debugTileset(){
       }
 
       // set a grid tiles to show connections
-      tileGrid[j++][k].state = getTile[1ull<<i];
+      tileGrid[j++][k] = getTile[1ull<<i];
    }
 
    it++;
