@@ -282,6 +282,8 @@ struct SectionTiles : SectionBase {
    void move(float x, float y);
 
    void showDropDown();
+
+   void showTiles();
 };
 
 SectionTiles::SectionTiles(float x, float y, std::string& tilesetName, std::vector<int>& weights, Grid& grid, float& scale):
@@ -317,6 +319,8 @@ void SectionTiles::display(){
 
    // show drop down if enabled
    if (dropDownEnabled){ showDropDown(); }
+
+   // display tiles and sliders
 }
 
 void SectionTiles::move(float x, float y){
@@ -367,4 +371,9 @@ void SectionTiles::showDropDown(){
 
       changeTileset(tilesetName, grid);
    }
+}
+
+void SectionTiles::showTiles(){
+
+
 }

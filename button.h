@@ -34,7 +34,7 @@ struct ButtonHold : ButtonBase{
    const bool holdable;
    int heldDuration{0};
 
-   ButtonHold(Texture& texture, float x, float y, float scale, bool holdable=false): ButtonBase(texture,x,y,scale), holdable(holdable){
+   ButtonHold(Texture2D& texture, float x, float y, float scale, bool holdable=false): ButtonBase(texture,x,y,scale), holdable(holdable){
       source = {0.0f, 0.0f, texture.width/3.0f, static_cast<float>(texture.height)};
       bounds = {x, y, source.width*scale, source.height*scale};
    };
@@ -50,6 +50,7 @@ bool ButtonHold::display(){
 
    bool clicked{false};
 
+   // mouse over button
    if (CheckCollisionPointRec(mousePos, bounds)){
 
       if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) ){
@@ -130,3 +131,42 @@ bool ButtonIcon::display(){
 
    return clicked;
 }
+
+// struct ButtonSlider : ButtonBase{
+
+//    int& value;
+
+//    Texture2D& slotTexture;
+//    Rectangle slotSource{0.0f,0.0f,static_cast<float>(slotTexture.width),static_cast<float>(slotTexture.height)};
+//    Rectangle slotBounds{0.0f,0.0f,slotSource.width*scale,slotSource.height*scale};
+
+//    ButtonSlider(Texture2D& texture, float x, float y, float scale, int& value, Texture2D& slotTexture):
+//       ButtonBase(texture,x,y,scale), value(value), slotTexture(slotTexture){
+//          source = {0.0f,0.0f,texture.width/3.0f,static_cast<float>(texture.height)};
+//          bounds = {x,y,source.width*scale,source.height*scale};
+//    }
+
+//    void display();
+// };
+
+// void ButtonSlider::display(){
+
+//    // mouse over button
+//    if (CheckCollisionPointRec(mousePos,bounds)){
+
+//       if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+//          state = 2;
+//          bounds.y = mousePos.y;
+
+//          // do not exit slot bounds
+//          if (bounds.y > slotBounds.y){ bounds.y = slotBounds.y; }
+//          else if (bounds.y < slotBounds.y+slotBounds.height){ bounds.y = slotBounds.y+slotBounds.height; }
+
+//          // calculate new value
+
+//       }
+//       else { state = 1; }
+
+//    }
+//    else { state = 0; }
+// }
