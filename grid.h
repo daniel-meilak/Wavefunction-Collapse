@@ -52,6 +52,7 @@ struct Grid{
 
    // debugging tileset analysis. Shows left<->right connections for each unique tile
    void debugTileset();
+   std::map<tileState, Bitset>::iterator debugIt;
 
    // Update grid
    void update();
@@ -92,6 +93,9 @@ Grid::Grid(const std::string& tilesetDir): texture(textureStore.getPtr(pathToTex
 
    // fill entropyList
    resetEntropy();
+
+   // setup debug it
+   if (debug){ debugIt = getBitset.begin(); }
 }
 
 void Grid::reset(){
@@ -105,6 +109,9 @@ void Grid::reset(){
 
    // set state to uncollapsed
    collapsed = false;
+
+   // if in debug
+   if (debug){ debugIt = getBitset.begin(); }
 }
 
 void Grid::update(){
@@ -318,15 +325,13 @@ void Grid::draw(){
 
 void Grid::debugTileset(){
 
-   static auto it = getBitset.begin();
-
    // stop whe it==last unique tile
-   if (it==getBitset.end()){ 
+   if (debugIt==getBitset.end()){ 
       reset();
       return;
    }
 
-   auto [state,bitset] = *it;
+   auto [state,bitset] = *debugIt;
 
    // clear grid
    reset();
@@ -352,7 +357,7 @@ void Grid::debugTileset(){
       tileGrid[j++][k] = getTile[1ull<<i];
    }
 
-   it++;
+   debugIt++;
 }
 
 //--------------------------------------------
@@ -376,6 +381,9 @@ void changeTileset(const std::string& newTileset, Grid& grid){
 
    // change grid texture pointer
    grid.texture = textureStore.getPtr(pathToTexture(newTileset));
+
+   // in debug reset grid.debugIt
+   if (debug){ grid.debugIt = getBitset.begin(); }
 
    // reset grid
    grid.reset();
