@@ -366,7 +366,6 @@ void Grid::debugTileset(){
 void changeTileset(const std::string& newTileset, Grid& grid){
 
    // reset global data
-   rotatable = true;
    nonRotatingIndex.clear();
    getBitset.clear();
    getTile.clear();
@@ -374,7 +373,6 @@ void changeTileset(const std::string& newTileset, Grid& grid){
    rightRotation.clear();
    leftRotation.clear();
    weights.clear();
-   uniqueTiles = 0;
 
    // analyze tileset
    analyzeTiles(pathToData(newTileset));

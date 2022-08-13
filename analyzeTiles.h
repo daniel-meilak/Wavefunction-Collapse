@@ -19,7 +19,7 @@
 bool rotatable{true};
 
 // index lookup for non rotating tilesets
-std::unordered_map<int,int> nonRotatingIndex;
+std::map<int,int> nonRotatingIndex;
 
 // map of tile index <-> bitset e.g. {0,1}<->[0001]
 std::map<tileState, Bitset> getBitset;
@@ -35,7 +35,7 @@ std::unordered_map<Bitset,Bitset> leftRotation;
 // vector of weights for each tile
 std::vector<int> weights;
 
-// number of unique tiles
+// number of unique tiles with/without rotation
 std::size_t uniqueTiles;
 
 // read information on tileset from file
@@ -53,6 +53,11 @@ void analyzeTiles(const std::string& filename){
    // check for tileset rotatability
    std::getline(dataFile,line);
    if (line=="no rotation"){ rotatable = false; }
+   else if (line=="rotate"){ rotatable = true;  }
+   else {
+      std::cerr << "Rotation type could not be found in \"" << filename << "\".\n";
+      std::exit(EXIT_FAILURE);
+   }
    std::getline(dataFile,line);
 
    // create list of tiles in braket {a,b} and bitset (00010) form 
@@ -72,8 +77,8 @@ void analyzeTiles(const std::string& filename){
       // get symmetry {Sym,_}
       int symmetry = std::stoi(i->str(1));
 
-      // save non rotating index if needed
-      if (!rotatable){ nonRotatingIndex[id] = index; }
+      // save index of unique tiles ignoring rotations
+      nonRotatingIndex[id] = index;
 
       for (int j=0; j<symmetry; j++){
          
@@ -94,7 +99,7 @@ void analyzeTiles(const std::string& filename){
    }
    std::getline(dataFile, line);
 
-   // set number of unique tiles
+   // set number of unique tiles including rotations
    uniqueTiles = getBitset.size();
 
    // keep track of connection names for next part
