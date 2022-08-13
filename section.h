@@ -272,6 +272,9 @@ struct SectionTiles : SectionBase {
    // grid to control
    Grid& grid;
 
+   // vector of tile buttons
+   std::vector<ButtonTile> tileButtons;
+
    // bool for showing drop down menu
    bool dropDownEnabled{false};
 
@@ -283,7 +286,7 @@ struct SectionTiles : SectionBase {
 
    void showDropDown();
 
-   void showTiles();
+   void createTileButtons();
 };
 
 SectionTiles::SectionTiles(float x, float y, std::string& tilesetName, std::vector<int>& weights, Grid& grid, float& scale):
@@ -303,6 +306,9 @@ SectionTiles::SectionTiles(float x, float y, std::string& tilesetName, std::vect
    for (const auto& entry : std::filesystem::directory_iterator(tilesetBaseDir)){
       tilesets.insert((*std::next(entry.path().begin())).string());
    }
+
+   // create tile buttons for lower menu
+   createTileButtons();
 }
 
 void SectionTiles::display(){
@@ -317,10 +323,11 @@ void SectionTiles::display(){
    // display tileset file
    DrawTextEx(font, tilesetName.c_str(), messagePos, fontSize, spacing, WHITE);
 
+   // display tiles
+   for (auto& button : tileButtons){ button.display(); }
+
    // show drop down if enabled
    if (dropDownEnabled){ showDropDown(); }
-
-   // display tiles and sliders
 }
 
 void SectionTiles::move(float x, float y){
@@ -370,10 +377,32 @@ void SectionTiles::showDropDown(){
       tilesetName = newTileset;
 
       changeTileset(tilesetName, grid);
+
+      // reset tile buttons
+      tileButtons.clear();
+      createTileButtons();
    }
 }
 
-void SectionTiles::showTiles(){
+void SectionTiles::createTileButtons(){
 
+   float startX{botBounds.x + botBounds.width*0.17f};
+   float startY{botBounds.y + botBounds.height*0.05f};
 
+   float addX{botBounds.width/3.0f};
+   float addY{tileSize*scale*0.5f + botBounds.height*0.05f};
+
+   int i{0};
+
+   // loop through tile ids
+   for (const auto& [_,tileId] : nonRotatingIndex ){
+      tileButtons.push_back(ButtonTile(*grid.texture, startX, startY, scale, tileId));
+
+      if ( ++i%3 == 0 ){
+         startX = botBounds.x + botBounds.width*0.17f;
+         startY += addY;
+         i=0;
+      }
+      else { startX += addX; }
+   }   
 }

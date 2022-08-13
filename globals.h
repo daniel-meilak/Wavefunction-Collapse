@@ -64,5 +64,5 @@ Vector2 mousePos{};
 float sinceLastUpdate{};
 
 // selected tileset directory
-std::string tilesetDir{"knots"};
+std::string tilesetDir{"pipes"};
 

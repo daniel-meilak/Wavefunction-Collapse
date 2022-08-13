@@ -22,7 +22,7 @@ struct ButtonBase {
 
    float& scale;
 
-   ButtonBase(Texture& texture, float x, float y, float& scale): texture(texture), scale(scale){};
+   ButtonBase(Texture& texture, float& scale): texture(texture), scale(scale){};
 };
 
 //---------------------------------------
@@ -34,7 +34,7 @@ struct ButtonHold : ButtonBase{
    const bool holdable;
    int heldDuration{0};
 
-   ButtonHold(Texture2D& texture, float x, float y, float scale, bool holdable=false): ButtonBase(texture,x,y,scale), holdable(holdable){
+   ButtonHold(Texture2D& texture, float x, float y, float scale, bool holdable=false): ButtonBase(texture,scale), holdable(holdable){
       source = {0.0f, 0.0f, texture.width/3.0f, static_cast<float>(texture.height)};
       bounds = {x, y, source.width*scale, source.height*scale};
    };
@@ -96,7 +96,7 @@ struct ButtonIcon : ButtonBase{
 
    bool& on;
 
-   ButtonIcon(Texture& texture, float x, float y, float scale, bool& on): ButtonBase(texture,x,y,scale), on(on){
+   ButtonIcon(Texture& texture, float x, float y, float scale, bool& on): ButtonBase(texture,scale), on(on){
       source = {0.0f, 0.0f, texture.width/3.0f, texture.height/2.0f};
       bounds = {x, y, source.width*scale, source.height*scale};
 
@@ -128,6 +128,51 @@ bool ButtonIcon::display(){
    source.x = state*texture.width/3.0f;
    
    DrawTexturePro(texture, source, bounds, {}, 0.0f, WHITE);
+
+   return clicked;
+}
+
+struct ButtonTile : ButtonBase{
+
+   bool on{true};
+
+   Rectangle border{};
+
+   ButtonTile(Texture& texture, float x, float y, float scale, float tileId): ButtonBase(texture,scale){
+      source = {tileId*tileSize, 0.0, static_cast<float>(texture.width/texture.height), static_cast<float>(texture.height)};
+      bounds = {x, y, source.width*scale*0.5f, source.height*scale*0.5f};
+      border = {x-1.0f, y-1.0f, bounds.width+2.0f, bounds.height+2.0f};
+   };
+
+   bool display();
+
+};
+
+bool ButtonTile::display(){
+   
+   bool clicked{false};
+
+   if (CheckCollisionPointRec(mousePos, bounds)){
+
+      if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) ){ state = 2; }
+      else { state = 1; }
+
+      if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+         clicked = true;
+         on = !on;
+      }
+   }
+   else { state = 0; }
+
+   Color color;
+   switch (state){
+      case 0: color = WHITE; break;
+      case 1: color = LIGHTGRAY; break;
+      case 2: color = GRAY; break;
+   }
+   
+   DrawTexturePro(texture, source, bounds, {}, 0.0f, on ? color : DARKGRAY);
+   DrawRectangleLinesEx(border, 1.0f, BLACK);
 
    return clicked;
 }

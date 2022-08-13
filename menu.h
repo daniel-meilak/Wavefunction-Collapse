@@ -129,7 +129,7 @@ void MenuVertical::addSection(Ts&&... args){
    
    // update minMax button bounds
    button.bounds.x = bounds.x + bounds.width*maximized;
-   button.bounds.y = (bounds.y + bounds.height)*0.25f - button.bounds.height*0.5f;
+   button.bounds.y = (bounds.y + 20.0f); //- button.bounds.height*0.5f;
 
    sections.push_back(std::move(section_ptr));
 }
