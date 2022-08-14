@@ -110,6 +110,12 @@ void Grid::reset(){
    // set state to uncollapsed
    collapsed = false;
 
+   // swap out weights
+   for (std::size_t i=0; i<weights.size(); i++){
+      currentWeights[i] = weights[i]*nextWeightSwitch[i];
+   }
+   weightSwitch = nextWeightSwitch;
+
    // if in debug
    if (debug){ debugIt = getBitset.begin(); }
 }
@@ -163,7 +169,7 @@ void Grid::update(){
       for (std::size_t i=0; i<uniqueTiles; i++){
          if (currentBitset[i]){
             possibilities.push_back(i);
-            adjustedWeights.push_back(weights[i]);
+            adjustedWeights.push_back(currentWeights[i]);
          }
       }
 
@@ -234,18 +240,22 @@ void Grid::update(){
             rotate(left, i, dir::anticlockwise);
 
             // get possible connections
-            right = connectsTo[left];
+            right = connectsTo[left];            
 
             // rotate connections back to original orientation
             rotate(right, i, dir::clockwise);
 
             // find all possibilites from union (bitwise |=) of all individual possibilities
             newPossibilities |= right;
-
-            if (debug && newPossibilities.count()==0){
-               std::cout << "Problem Here?" << std::endl;
-            }
          }         
+
+         // remove all disabled tiles (weight = 0)
+         newPossibilities &= weightSwitch;
+
+         // error if no tile can be placed
+         if (debug && newPossibilities.count()==0){
+            std::cout << "Problem Here?" << std::endl;
+         }
 
          std::size_t oldCount=nearBitset.count(), newCount;
 
@@ -257,7 +267,8 @@ void Grid::update(){
 
          // if there is no possible tile to collapse to, the simulation ends
          if (newCount == 0){
-            std::cout << "Tile {" << resolvingPos.x << "," << resolvingPos.y << "} cannot be collapsed. Simulation halted." <<std::endl;
+            std::cerr << "Tile {" << resolvingPos.x << "," << resolvingPos.y << "} cannot be collapsed. Resetting grid." <<std::endl;
+            reset();
             return;
          }
 
@@ -367,12 +378,17 @@ void changeTileset(const std::string& newTileset, Grid& grid){
 
    // reset global data
    nonRotatingIndex.clear();
+   symmetryIndex.clear();
    getBitset.clear();
    getTile.clear();
    connectsTo.clear();
    rightRotation.clear();
    leftRotation.clear();
    weights.clear();
+   currentWeights.clear();
+   nextWeights.clear();
+   weightSwitch = std::move(Bitset{}.set());
+   nextWeightSwitch.set();
 
    // analyze tileset
    analyzeTiles(pathToData(newTileset));

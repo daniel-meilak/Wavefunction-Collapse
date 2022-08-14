@@ -34,15 +34,15 @@ int main(){
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
+        // reset on completion
+        if (grid.collapsed){ grid.reset(); }
+
         // draw grid and menu
         grid.draw();
         menus.display();
 
         // collapse next grid position
         grid.update();
-
-        // reset on completion
-        if (grid.collapsed){ grid.reset(); }
 
         EndDrawing();
     }

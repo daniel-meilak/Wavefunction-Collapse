@@ -21,6 +21,9 @@ bool rotatable{true};
 // index lookup for non rotating tilesets
 std::map<int,int> nonRotatingIndex;
 
+// vector of symmetries
+std::vector<int> symmetryIndex;
+
 // map of tile index <-> bitset e.g. {0,1}<->[0001]
 std::map<tileState, Bitset> getBitset;
 std::unordered_map<Bitset,tileState> getTile;
@@ -32,8 +35,12 @@ std::unordered_map<Bitset,Bitset> connectsTo;
 std::unordered_map<Bitset,Bitset> rightRotation;
 std::unordered_map<Bitset,Bitset> leftRotation;
 
-// vector of weights for each tile
-std::vector<int> weights;
+// vector of weights for each tile 
+std::vector<int> weights;         // original
+std::vector<int> currentWeights;  // used in current simulation
+std::vector<int> nextWeights;     // used in next simulation
+auto weightSwitch = std::move(Bitset{}.set());  // turn tile on/off (use char to avoid bool specialization);
+auto nextWeightSwitch = std::move(Bitset{}.set());
 
 // number of unique tiles with/without rotation
 std::size_t uniqueTiles;
@@ -96,8 +103,13 @@ void analyzeTiles(const std::string& filename){
 
       id++;
       index += symmetry;
+      symmetryIndex.push_back(symmetry);
    }
    std::getline(dataFile, line);
+
+   // copy weights over
+   currentWeights = weights;
+   nextWeights    = weights;
 
    // set number of unique tiles including rotations
    uniqueTiles = getBitset.size();

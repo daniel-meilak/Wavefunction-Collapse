@@ -11,6 +11,7 @@
 
 #include"globals.h"
 #include"storage.h"
+#include"utils.h"
 
 struct ButtonBase {
 
@@ -134,32 +135,38 @@ bool ButtonIcon::display(){
 
 struct ButtonTile : ButtonBase{
 
+   Bitset controlledTiles;
+
    bool on{true};
 
    Rectangle border{};
 
-   ButtonTile(Texture& texture, float x, float y, float scale, float tileId): ButtonBase(texture,scale){
-      source = {tileId*tileSize, 0.0, static_cast<float>(texture.width/texture.height), static_cast<float>(texture.height)};
-      bounds = {x, y, source.width*scale*0.5f, source.height*scale*0.5f};
+   ButtonTile(Texture& texture, float x, float y, float scale, float tileId, int rotatingId): ButtonBase(texture,scale){
+      source = {tileId*tileSize, 0.0, static_cast<float>(tileSize), static_cast<float>(tileSize)};
+      bounds = {x, y, tileSize*scale*0.5f, tileSize*scale*0.5f};
       border = {x-1.0f, y-1.0f, bounds.width+2.0f, bounds.height+2.0f};
+
+      // create bitset of controlled tiles
+      for (int i=0; i<symmetryIndex[rotatingId]; i++){
+         controlledTiles.set(nonRotatingIndex[rotatingId]+i);
+      }
    };
 
-   bool display();
+   void display();
 
 };
 
-bool ButtonTile::display(){
+void ButtonTile::display(){
    
-   bool clicked{false};
-
    if (CheckCollisionPointRec(mousePos, bounds)){
 
       if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) ){ state = 2; }
       else { state = 1; }
 
+      // on mouse click flip all weights controlled by this button
       if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-         clicked = true;
          on = !on;
+         nextWeightSwitch^=controlledTiles;
       }
    }
    else { state = 0; }
@@ -173,8 +180,6 @@ bool ButtonTile::display(){
    
    DrawTexturePro(texture, source, bounds, {}, 0.0f, on ? color : DARKGRAY);
    DrawRectangleLinesEx(border, 1.0f, BLACK);
-
-   return clicked;
 }
 
 // struct ButtonSlider : ButtonBase{

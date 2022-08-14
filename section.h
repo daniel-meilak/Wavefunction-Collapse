@@ -323,7 +323,7 @@ void SectionTiles::display(){
    // display tileset file
    DrawTextEx(font, tilesetName.c_str(), messagePos, fontSize, spacing, WHITE);
 
-   // display tiles
+   // display tiles and change weights if on
    for (auto& button : tileButtons){ button.display(); }
 
    // show drop down if enabled
@@ -386,17 +386,18 @@ void SectionTiles::showDropDown(){
 
 void SectionTiles::createTileButtons(){
 
+   // set up for button positions
    float startX{botBounds.x + botBounds.width*0.17f};
-   float startY{botBounds.y + botBounds.height*0.05f};
+   float startY{botBounds.y + tileSize*scale*0.1f};
 
    float addX{botBounds.width/3.0f};
-   float addY{tileSize*scale*0.5f + botBounds.height*0.05f};
+   float addY{tileSize*scale*0.7f};
 
    int i{0};
 
    // loop through tile ids
-   for (const auto& [_,tileId] : nonRotatingIndex ){
-      tileButtons.push_back(ButtonTile(*grid.texture, startX, startY, scale, tileId));
+   for (const auto& [rotatingId,nonRotatingId] : nonRotatingIndex ){
+      tileButtons.push_back(ButtonTile(*grid.texture, startX, startY, scale, rotatable ? rotatingId : nonRotatingId, rotatingId));
 
       if ( ++i%3 == 0 ){
          startX = botBounds.x + botBounds.width*0.17f;
@@ -405,4 +406,7 @@ void SectionTiles::createTileButtons(){
       }
       else { startX += addX; }
    }   
+
+   // resize botBounds to contain all tiles
+   botBounds.height = tileButtons.back().bounds.y + addY - botBounds.y;
 }
