@@ -47,6 +47,9 @@ constexpr std::string_view tilesetBaseDir{"tilesets"};
 constexpr std::string_view tilesetFile{"tileset.png"};
 constexpr std::string_view tilesetDataFile{"data.txt"};
 
+// wait time after a grid collapse
+constexpr float waitTime{5.0f};
+
 // debug
 constexpr bool debug{false};
 

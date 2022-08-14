@@ -44,6 +44,9 @@ struct Grid{
    // pause grid update
    bool running{true};
 
+   // wait timer
+   float waitTimer{0.0f};
+
    // flag for full collapse
    bool collapsed{false};
 
@@ -62,6 +65,9 @@ struct Grid{
 
    // reset grid to default state
    void reset();
+
+   // pause for duration
+   bool waiting();
 
    // reset entropy
    void resetEntropy();
@@ -98,6 +104,19 @@ Grid::Grid(const std::string& tilesetDir): texture(textureStore.getPtr(pathToTex
    if (debug){ debugIt = getBitset.begin(); }
 }
 
+bool Grid::waiting(){
+   
+   // If timer is active
+   if (waitTimer > 0.0f){
+      
+      if (sinceLastUpdate >= waitTimer){ collapsed = true; }
+      
+      return true;
+   }
+   else { return false; }
+
+}
+
 void Grid::reset(){
    
    // reset Grids
@@ -116,6 +135,9 @@ void Grid::reset(){
    }
    weightSwitch = nextWeightSwitch;
 
+   // set wait timer to 0
+   waitTimer = 0.0f;
+
    // if in debug
    if (debug){ debugIt = getBitset.begin(); }
 }
@@ -123,10 +145,10 @@ void Grid::reset(){
 void Grid::update(){
 
    // if grid is paused
-   // or all tiles are collapsed
    // or not enough time has passed for next update
+   // or there is a wait timer (grid is paused for 'waitTime' secs after completing a collapse)
    // continue
-   if (!running || collapsed || sinceLastUpdate < 1.0f/updateSpeed){ return; }
+   if (!running || waiting() || sinceLastUpdate < 1.0f/updateSpeed){ return; }
 
    // reset time since last update
    sinceLastUpdate=0.0f;
@@ -189,8 +211,12 @@ void Grid::update(){
 
    // check if wavefunction is fully collapsed
    if (entropyList.empty()){
-      collapsed = true;
+
       if (debug){ std::cout << "Grid is fully Collapsed!\n"; }
+
+      // pause grid for 5 seconds
+      waitTimer = waitTime;
+
       return;
    }
 
