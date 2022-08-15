@@ -134,12 +134,15 @@ struct SectionRange2 : SectionRangeBase {
 SectionRange2::SectionRange2(float x, float y, int tileIndex, int min, int max, float scale): SectionRangeBase(x,y,min,max,scale), tileIndex(tileIndex){
 
    // bounds
-   bounds = {x,y,leftButton.bounds.width*4.0f,leftButton.bounds.height};
+   bounds = {x,y - leftButton.bounds.height*0.5f,leftButton.bounds.width*4.0f,leftButton.bounds.height};
 
    // fill controlledWeights
    for (int i=0; i<symmetryIndex[tileIndex]; i++){
       controlledWeights.push_back(&currentWeights[nonRotatingIndex[tileIndex] + i]);
    }
+
+   // reduce font size
+   fontSize -= 2.0f;
 
    // move buttons
    moveButtons(x,y);
@@ -151,8 +154,8 @@ void SectionRange2::display(){
    int weight = *controlledWeights[0];
 
    // align weight text
-   const char* text = std::to_string(weight).c_str();
-   Vector2 textSize = MeasureTextEx(font, text, fontSize, spacing);
+   std::string text = std::to_string(weight);
+   Vector2 textSize = MeasureTextEx(font, text.c_str(), fontSize, spacing);
    messagePos = {bounds.x + 0.5f*bounds.width - 0.5f*textSize.x, bounds.y + 0.5f*bounds.height - 0.5f*textSize.y};
 
    // If tile is currently turned off, grey out controlls
@@ -167,7 +170,7 @@ void SectionRange2::display(){
    }   
 
    // display message
-   DrawTextEx(font, text, messagePos, fontSize, spacing, WHITE);
+   DrawTextEx(font, text.c_str(), messagePos, fontSize, spacing, WHITE);
 }
 
 //---------------------------------------------------------------------------
@@ -454,8 +457,10 @@ void SectionTiles::createTileButtons(){
 
    // set up for button positions
    float startX{botBounds.x + botBounds.width*0.17f};
-   float startX2{botBounds.x};
    float startY{botBounds.y + tileSize*scale*0.1f};
+
+   float startX2{botBounds.x+1.0f*scale};
+   float startY2{startY + tileSize*scale*0.25f};
 
    float addX{botBounds.width/3.0f};
    float addY{tileSize*scale*0.7f};
@@ -469,13 +474,14 @@ void SectionTiles::createTileButtons(){
       tileButtons.push_back(ButtonTile(*grid.texture, startX, startY, scale, rotatable ? rotatingId : nonRotatingId, rotatingId));
 
       // create tile weight controls
-      weightControls.push_back(SectionRange2(startX2, startY, rotatingId, 1, 200, scale/2.0f));
+      weightControls.push_back(SectionRange2(startX2, startY2, rotatingId, 1, 200, scale/2.0f));
 
       // set position for next button
       if ( ++i%3 == 0 ){
          startX  = botBounds.x + botBounds.width*0.17f;
-         startX2 = botBounds.x;
+         startX2 = botBounds.x+1.0f*scale;
          startY += addY;
+         startY2+= addY;
          i=0;
       }
       else {
