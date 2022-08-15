@@ -359,8 +359,7 @@ void Grid::draw(){
       for (int i=0; i<gridWidth; i++){
          DrawLine(static_cast<float>(i*tileScaled), 0.0f, static_cast<float>(i*tileScaled), gridWidth*tileScaled, RED);
       }
-   }
-   
+   }   
 }
 
 void Grid::debugTileset(){

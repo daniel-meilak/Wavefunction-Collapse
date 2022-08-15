@@ -26,7 +26,7 @@ constexpr int tileScaled{scaling*tileSize};
 
 // grid dimensions
 constexpr int gridWidth{24};
-constexpr int gridHeight{15};
+constexpr int gridHeight{12};
 
 // window size
 constexpr int screenWidth{gridWidth*tileSize*scaling};
