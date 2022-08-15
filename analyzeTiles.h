@@ -51,6 +51,10 @@ std::size_t uniqueTiles;
 void analyzeTiles(const std::string& filename){
 
    std::ifstream dataFile(filename);
+   if (!dataFile.is_open()){
+      std::cerr << "Could not open \"" << filename << "\". Exiting.\n";
+      std::exit(EXIT_FAILURE);
+   }
 
    // regex matching "{a,b}", returning a,b as submatches
    std::regex tileIndices("\\{(\\d+)\\,(\\d+)\\}");
@@ -59,6 +63,8 @@ void analyzeTiles(const std::string& filename){
 
    // check for tileset rotatability
    std::getline(dataFile,line);
+   if (line.back() == '\r'){ line.pop_back(); }
+
    if (line=="no rotation"){ rotatable = false; }
    else if (line=="rotate"){ rotatable = true;  }
    else {
@@ -66,11 +72,13 @@ void analyzeTiles(const std::string& filename){
       std::exit(EXIT_FAILURE);
    }
    std::getline(dataFile,line);
+   if (line.back() == '\r'){ line.pop_back(); }
 
    // create list of tiles in braket {a,b} and bitset (00010) form 
    int id{0};
    std::size_t index{0};
    std::getline(dataFile,line);
+   if (line.back() == '\r'){ line.pop_back(); }
 
    // use regex to get each {a,b} a=tile symmetry, b=tile weight
    auto begin = std::sregex_iterator(line.begin(), line.end(), tileIndices);
@@ -106,6 +114,7 @@ void analyzeTiles(const std::string& filename){
       symmetryIndex.push_back(symmetry);
    }
    std::getline(dataFile, line);
+   if (line.back() == '\r'){ line.pop_back(); }
 
    // copy weights over
    currentWeights = weights;
@@ -119,6 +128,7 @@ void analyzeTiles(const std::string& filename){
 
    // create bitsets for named connections
    while (std::getline(dataFile,line)){
+      if (line.back() == '\r'){ line.pop_back(); }
 
       // stop at empty line
       if (line.empty()){ break; }
@@ -165,6 +175,7 @@ void analyzeTiles(const std::string& filename){
 
    // finally get leftright connections for each tile
    while (getline(dataFile,line)){
+      if (line.back() == '\r'){ line.pop_back(); }
 
       // stop at empty line
       if (line.empty()){ break; }
