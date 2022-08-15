@@ -1,10 +1,10 @@
-# Wavefunction Collapse using C++ and raylib
+# Wave Function Collapse using C++ and raylib
 
-This repo is my attempt at implementing a simple wavefunction collapse algorithm specifically for tilesets. It is inspired by the work of [Maxim Gumin](https://github.com/mxgmn/WaveFunctionCollapse).
+This repo is my attempt at implementing a simple wave function collapse algorithm specifically for tilesets. It is inspired by the work of [Maxim Gumin](https://github.com/mxgmn/WaveFunctionCollapse).
 
 The program includes hand made controls for changing the speed of the simulation, as well as swapping out the tilesets.
 
-Currently the work requires [raylib](https://www.raylib.com/) to be preinstalled (with a working C++ compiler) to run. In the future I will include a playable version (compiled with ecmascript) on Itch.io and possibly add a CMake build.
+Currently the work requires [raylib](https://www.raylib.com/) to be preinstalled (with a working C++ compiler) to compile. There is a playable version (compiled using emscripten) on [Itch.io](https://atiladhun.itch.io/wavefunction-collapse)!
 
 The C++ code is written using modern C++, and requires C++20 support to compile. 
 
@@ -15,9 +15,11 @@ The `data.txt` files included with each texture are in a custom format. I may ch
 ## Examples:
 
 <p align="center"><img alt="Circuit building animation" src="images/Animation.gif"></p>
-(controls not shown)
+
+![Screenshot of knot tileset and tile menu](images/Screenshot2.png)
+
+![Screenshot of pipe tileset and control menu](images/Screenshot3.png)
 
 ## To do:
 - Add CMake recipe
-- Put on Itch.io and get playable link
 - Add more tilesets
