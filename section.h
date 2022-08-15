@@ -31,24 +31,19 @@ struct SectionBase{
    virtual ~SectionBase(){};
 };
 
-//---------------------------------------------------------
-// Section with centre message and incr+decr arrow buttons
-//---------------------------------------------------------
+//--------------------------------------------------
+// Section with value and incr+decr arrow buttons
+//--------------------------------------------------
 struct SectionRange : SectionBase {
 
    // alpha_beta font by Brian Kent (AEnigma)
    Font& font{fontStore.getRef("fonts/alpha_beta.png")};
 
-   // Texture
-   Texture2D& texture;
-   Rectangle source{0.0f, 0.0f, texture.width/3.0f, static_cast<float>(texture.height)};
-
-   // message properties
-   std::string message;
+   // font for displaying value
+   float fontSize{font.baseSize*scale};
+   float spacing{1.0f*scale};
    Vector2 messagePos;
-   float fontSize{static_cast<float>(font.baseSize)};
-   float spacing{1.0f};
-   
+
    // int value to change
    int& variable;
 
@@ -56,34 +51,78 @@ struct SectionRange : SectionBase {
    ButtonHold leftButton{textureStore.getRef("UI/left-arrow.png"), 0.0f, 0.0f, scale, true};
    ButtonHold rightButton{textureStore.getRef("UI/right-arrow.png"), 0.0f, 0.0f, scale, true};
 
-   SectionRange(float x, float y, std::string filename, std::string message, int& variable, float& scale);
+   // min max values for buttons
+   int min;
+   int max;
 
-   void display() override;
+   void moveButtons(float x, float y);
 
-   void move(float x, float y);
-};
+   virtual void display() override;
 
-SectionRange::SectionRange(float x, float y, std::string filename, std::string message, int& variable, float& scale):
-   SectionBase(scale), texture(textureStore.getRef(filename.c_str())), message(message), variable(variable){
-      
-      // set scaling
-      bounds.width = source.width*scale;
-      bounds.height = source.height*scale;
-      fontSize *= scale;
-      spacing *= scale;
+   SectionRange(float x, float y, int& variable, int min, int max, float& scale):
+      SectionBase(scale), variable(variable), min(min), max(max){};
 
-      // move to correct position in menu
-      move(x,y);
 };
 
 void SectionRange::display(){
+
+   // display left and right buttons and get state
+   if (rightButton.display() && variable<max){ variable++; };
+   if (leftButton.display()  && variable>min){ variable--; };
+
+   const char* text = std::to_string(variable).c_str();
+
+   // align message
+   Vector2 textSize = MeasureTextEx(font, text, fontSize, spacing);
+   messagePos = {bounds.x + 0.5f*bounds.width - 0.5f*textSize.x, bounds.y + 0.5f*bounds.height - 0.5f*textSize.y};
+
+   // display message
+   DrawTextEx(font, text, messagePos, fontSize, spacing, WHITE);
+}
+
+void SectionRange::moveButtons(float x, float y){
+
+   // buttons are vertically centred and 5% away from border
+   leftButton.bounds.x  = bounds.x + 0.05f*bounds.width;
+   rightButton.bounds.x = bounds.x + 0.95f*bounds.width - rightButton.bounds.width;
+
+   leftButton.bounds.y = bounds.y + 0.5f*bounds.height - 0.5f*leftButton.bounds.height;
+   rightButton.bounds.y = leftButton.bounds.y;
+}
+
+//---------------------------------------------------------------------
+// Section with background, message+value and incr+decr arrow buttons
+//---------------------------------------------------------------------
+struct SectionRange2 : SectionRange {
+
+   // Texture
+   Texture2D& texture;
+   Rectangle source{0.0f, 0.0f, texture.width/3.0f, static_cast<float>(texture.height)};
+
+   // message properties
+   std::string message;
+
+   SectionRange2(float x, float y, std::string filename, std::string message, int& variable, int min, int max, float& scale);
+
+   void display() override;
+};
+
+SectionRange2::SectionRange2(float x, float y, std::string filename, std::string message, int& variable, int min, int max, float& scale):
+   SectionRange(x,y,variable,min,max,scale), texture(textureStore.getRef(filename.c_str())), message(message){
+
+      bounds = {x,y,source.width*scale, source.height*scale};
+
+      moveButtons(x,y);
+}
+
+void SectionRange2::display(){
 
    // display background
    DrawTexturePro(texture, source, bounds, {}, 0.0f, WHITE);
 
    // display left and right buttons and get state
-   if (rightButton.display() && variable<fps){ variable++; };
-   if (leftButton.display()  && variable!=0 ){ variable--; };
+   if (rightButton.display() && variable<max){ variable++; };
+   if (leftButton.display()  && variable>min){ variable--; };
 
    std::string text = message + std::to_string(variable);
 
@@ -93,20 +132,6 @@ void SectionRange::display(){
 
    // display message
    DrawTextEx(font, text.c_str(), messagePos, fontSize, spacing, WHITE);
-}
-
-void SectionRange::move(float x, float y){
-
-   // move section
-   bounds.x = x;
-   bounds.y = y;
-
-   // buttons are vertically centred and 5% away from border
-   leftButton.bounds.x  = bounds.x + 0.05f*bounds.width;
-   rightButton.bounds.x = bounds.x + 0.95f*bounds.width - rightButton.bounds.width;
-
-   leftButton.bounds.y = bounds.y + 0.5f*bounds.height - 0.5f*leftButton.bounds.height;
-   rightButton.bounds.y = leftButton.bounds.y;
 }
 
 //---------------------------------------------------------------------------

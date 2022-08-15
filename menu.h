@@ -146,7 +146,7 @@ std::unique_ptr<MenuHorizontal> createControlsMenu(float x, float y, Grid& grid,
 
    menu->addSection<SectionBasicButton>("UI/rectangle-sheet.png", "Reset", grid, reset);
    menu->addSection<SectionBoolIcon>("UI/play-pause.png", playPause);
-   menu->addSection<SectionRange>("UI/rectangle-sheet.png", "Speed: ", speed);
+   menu->addSection<SectionRange2>("UI/rectangle-sheet.png", "Speed: ", speed, 0.0, fps);
 
    return menu;
 }
