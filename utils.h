@@ -24,3 +24,8 @@ std::string pathToData(const std::string& tilesetDir){
 
    return result; 
 }
+
+// print state
+void print(const tileState& state){
+   std::cout << "{" << state.x << "," << state.y << "}"; 
+}
