@@ -17,20 +17,20 @@
 constexpr int fps{60};
 
 // tile size multiplier
-constexpr int scale{2};
+constexpr int scaling{2};
 
 // tile width/height original size (pixels)
 constexpr int tileSize{32};
 constexpr int tileArea{tileSize*tileSize};
-constexpr int tileScaled{scale*tileSize};
+constexpr int tileScaled{scaling*tileSize};
 
 // grid dimensions
 constexpr int gridWidth{24};
 constexpr int gridHeight{15};
 
 // window size
-constexpr int screenWidth{gridWidth*tileSize*scale};
-constexpr int screenHeight{gridHeight*tileSize*scale};
+constexpr int screenWidth{gridWidth*tileSize*scaling};
+constexpr int screenHeight{gridHeight*tileSize*scaling};
 
 // bitset max and alias
 constexpr std::size_t N=64;

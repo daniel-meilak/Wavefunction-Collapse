@@ -36,9 +36,9 @@ std::unordered_map<Bitset,Bitset> rightRotation;
 std::unordered_map<Bitset,Bitset> leftRotation;
 
 // vector of weights for each tile 
-std::vector<int> weights;         // original
-std::vector<int> currentWeights;  // used in current simulation
-std::vector<int> nextWeights;     // used in next simulation
+std::vector<int> weights;              // original
+std::vector<int> currentWeights;       // used in current simulation
+std::vector<int> savedWeights;      // weights affected by range buttons
 auto weightSwitch = std::move(Bitset{}.set());  // turn tile on/off (use char to avoid bool specialization);
 auto nextWeightSwitch = std::move(Bitset{}.set());
 
@@ -109,7 +109,7 @@ void analyzeTiles(const std::string& filename){
 
    // copy weights over
    currentWeights = weights;
-   nextWeights    = weights;
+   savedWeights   = weights;
 
    // set number of unique tiles including rotations
    uniqueTiles = getBitset.size();

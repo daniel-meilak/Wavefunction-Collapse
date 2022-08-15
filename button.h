@@ -21,9 +21,9 @@ struct ButtonBase {
 
    int state{0}; // 0 normal, 1 hover, 2 click
 
-   float& scale;
+   float scale;
 
-   ButtonBase(Texture& texture, float& scale): texture(texture), scale(scale){};
+   ButtonBase(Texture& texture, float scale): texture(texture), scale(scale){};
 };
 
 //---------------------------------------
@@ -45,7 +45,14 @@ struct ButtonHold : ButtonBase{
 
    // display at new coordinate
    bool display_at(float x, float y);
+
+   // display greyed out and not usable
+   void display_grayed();
 };
+
+void ButtonHold::display_grayed(){
+   DrawTexturePro(texture, source, bounds, {}, 0.0f, DARKGRAY);
+}
 
 bool ButtonHold::display(){
 

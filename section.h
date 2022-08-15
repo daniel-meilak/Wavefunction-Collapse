@@ -2,6 +2,7 @@
 
 #include<filesystem>
 #include<iterator>
+#include<memory.h>
 #include<string>
 #include<unordered_set>
 #include<vector>
@@ -18,7 +19,7 @@
 struct SectionBase{
 
    // scaling for everything in the secion
-   float& scale;
+   float scale;
 
    // Each section has a bounds set at initialization
    Rectangle bounds{};
@@ -26,15 +27,15 @@ struct SectionBase{
    // display each seaction
    virtual void display() = 0;
 
-   SectionBase(float& scale):scale(scale){};
+   SectionBase(float scale): scale(scale){};
 
    virtual ~SectionBase(){};
 };
 
 //--------------------------------------------------
-// Section with value and incr+decr arrow buttons
+// Section with incr+decr arrow buttons
 //--------------------------------------------------
-struct SectionRange : SectionBase {
+struct SectionRangeBase : SectionBase {
 
    // alpha_beta font by Brian Kent (AEnigma)
    Font& font{fontStore.getRef("fonts/alpha_beta.png")};
@@ -44,9 +45,6 @@ struct SectionRange : SectionBase {
    float spacing{1.0f*scale};
    Vector2 messagePos;
 
-   // int value to change
-   int& variable;
-
    // associated buttons
    ButtonHold leftButton{textureStore.getRef("UI/left-arrow.png"), 0.0f, 0.0f, scale, true};
    ButtonHold rightButton{textureStore.getRef("UI/right-arrow.png"), 0.0f, 0.0f, scale, true};
@@ -55,32 +53,15 @@ struct SectionRange : SectionBase {
    int min;
    int max;
 
+   SectionRangeBase(float x, float y, int min, int max, float scale):
+      SectionBase(scale), min(min), max(max){};
+
    void moveButtons(float x, float y);
 
-   virtual void display() override;
-
-   SectionRange(float x, float y, int& variable, int min, int max, float& scale):
-      SectionBase(scale), variable(variable), min(min), max(max){};
-
+   virtual void display() = 0;
 };
 
-void SectionRange::display(){
-
-   // display left and right buttons and get state
-   if (rightButton.display() && variable<max){ variable++; };
-   if (leftButton.display()  && variable>min){ variable--; };
-
-   const char* text = std::to_string(variable).c_str();
-
-   // align message
-   Vector2 textSize = MeasureTextEx(font, text, fontSize, spacing);
-   messagePos = {bounds.x + 0.5f*bounds.width - 0.5f*textSize.x, bounds.y + 0.5f*bounds.height - 0.5f*textSize.y};
-
-   // display message
-   DrawTextEx(font, text, messagePos, fontSize, spacing, WHITE);
-}
-
-void SectionRange::moveButtons(float x, float y){
+void SectionRangeBase::moveButtons(float x, float y){
 
    // buttons are vertically centred and 5% away from border
    leftButton.bounds.x  = bounds.x + 0.05f*bounds.width;
@@ -93,29 +74,31 @@ void SectionRange::moveButtons(float x, float y){
 //---------------------------------------------------------------------
 // Section with background, message+value and incr+decr arrow buttons
 //---------------------------------------------------------------------
-struct SectionRange2 : SectionRange {
+struct SectionRange1 : SectionRangeBase {
 
    // Texture
    Texture2D& texture;
    Rectangle source{0.0f, 0.0f, texture.width/3.0f, static_cast<float>(texture.height)};
 
+   int& variable;
+
    // message properties
    std::string message;
 
-   SectionRange2(float x, float y, std::string filename, std::string message, int& variable, int min, int max, float& scale);
+   SectionRange1(float x, float y, std::string filename, std::string message, int& variable, int min, int max, float scale);
 
    void display() override;
 };
 
-SectionRange2::SectionRange2(float x, float y, std::string filename, std::string message, int& variable, int min, int max, float& scale):
-   SectionRange(x,y,variable,min,max,scale), texture(textureStore.getRef(filename.c_str())), message(message){
+SectionRange1::SectionRange1(float x, float y, std::string filename, std::string message, int& variable, int min, int max, float scale):
+   SectionRangeBase(x,y,min,max,scale), texture(textureStore.getRef(filename.c_str())), variable(variable), message(message){
 
       bounds = {x,y,source.width*scale, source.height*scale};
 
       moveButtons(x,y);
 }
 
-void SectionRange2::display(){
+void SectionRange1::display(){
 
    // display background
    DrawTexturePro(texture, source, bounds, {}, 0.0f, WHITE);
@@ -132,6 +115,59 @@ void SectionRange2::display(){
 
    // display message
    DrawTextEx(font, text.c_str(), messagePos, fontSize, spacing, WHITE);
+}
+
+//------------------------------------------------------
+// Section with multiple values incr+decr arrow buttons
+//------------------------------------------------------
+struct SectionRange2 : SectionRangeBase {
+
+   std::vector<int*> controlledWeights;
+
+   int tileIndex;
+
+   SectionRange2(float x, float y, int tileIndex, int min, int max, float scale);
+
+   void display() override;
+};
+
+SectionRange2::SectionRange2(float x, float y, int tileIndex, int min, int max, float scale): SectionRangeBase(x,y,min,max,scale), tileIndex(tileIndex){
+
+   // bounds
+   bounds = {x,y,leftButton.bounds.width*4.0f,leftButton.bounds.height};
+
+   // fill controlledWeights
+   for (int i=0; i<symmetryIndex[tileIndex]; i++){
+      controlledWeights.push_back(&currentWeights[nonRotatingIndex[tileIndex] + i]);
+   }
+
+   // move buttons
+   moveButtons(x,y);
+}
+
+void SectionRange2::display(){
+
+   // get first weight
+   int weight = *controlledWeights[0];
+
+   // align weight text
+   const char* text = std::to_string(weight).c_str();
+   Vector2 textSize = MeasureTextEx(font, text, fontSize, spacing);
+   messagePos = {bounds.x + 0.5f*bounds.width - 0.5f*textSize.x, bounds.y + 0.5f*bounds.height - 0.5f*textSize.y};
+
+   // If tile is currently turned off, grey out controlls
+   if ( weightSwitch[nonRotatingIndex[tileIndex]] == 0){
+      rightButton.display_grayed();
+      leftButton.display_grayed();
+   }
+   // else display normally and with usable buttons
+   else {
+      if (rightButton.display() && weight<max){ for (auto ptr : controlledWeights){ (*ptr)++; } };
+      if (leftButton.display()  && weight>min){ for (auto ptr : controlledWeights){ (*ptr)--; } };
+   }   
+
+   // display message
+   DrawTextEx(font, text, messagePos, fontSize, spacing, WHITE);
 }
 
 //---------------------------------------------------------------------------
@@ -159,14 +195,14 @@ struct SectionBasicButton : SectionBase {
    // button
    ButtonHold button{texture, 0.0f, 0.0f, scale};
 
-   SectionBasicButton(float x, float y, std::string filename, std::string message, Grid& grid, std::function<void(Grid&)> func, float& scale);
+   SectionBasicButton(float x, float y, std::string filename, std::string message, Grid& grid, std::function<void(Grid&)> func, float scale);
 
    void display() override;
 
    void move(float x, float y);
 };
 
-SectionBasicButton::SectionBasicButton(float x, float y, std::string filename, std::string message, Grid& grid, std::function<void(Grid&)> func, float& scale):
+SectionBasicButton::SectionBasicButton(float x, float y, std::string filename, std::string message, Grid& grid, std::function<void(Grid&)> func, float scale):
    SectionBase(scale), texture(textureStore.getRef(filename.c_str())), message(message), grid(grid), func(func){
       
       bounds = {x, y,texture.width*scale/3.0f, texture.height*scale};
@@ -215,14 +251,14 @@ struct SectionBoolIcon : SectionBase {
    // button
    ButtonIcon button{texture, 0.0f, 0.0f, scale, variable};
 
-   SectionBoolIcon(float x, float y, std::string filename, bool& variable, float& scale);
+   SectionBoolIcon(float x, float y, std::string filename, bool& variable, float scale);
 
    void display() override;
 
    void move(float x, float y);
 };
 
-SectionBoolIcon::SectionBoolIcon(float x, float y, std::string filename, bool& variable, float& scale):
+SectionBoolIcon::SectionBoolIcon(float x, float y, std::string filename, bool& variable, float scale):
    SectionBase(scale), texture(textureStore.getRef(filename.c_str())), variable(variable){
 
       bounds = {x,y,texture.width*scale/3.0f, texture.height*scale*0.5f};
@@ -299,11 +335,12 @@ struct SectionTiles : SectionBase {
 
    // vector of tile buttons
    std::vector<ButtonTile> tileButtons;
+   std::vector<SectionRange2> weightControls;
 
    // bool for showing drop down menu
    bool dropDownEnabled{false};
 
-   SectionTiles(float x, float y, std::string& tilesetName, std::vector<int>& weights, Grid& grid, float& scale);
+   SectionTiles(float x, float y, std::string& tilesetName, std::vector<int>& weights, Grid& grid, float scale);
 
    void display() override;
 
@@ -314,7 +351,7 @@ struct SectionTiles : SectionBase {
    void createTileButtons();
 };
 
-SectionTiles::SectionTiles(float x, float y, std::string& tilesetName, std::vector<int>& weights, Grid& grid, float& scale):
+SectionTiles::SectionTiles(float x, float y, std::string& tilesetName, std::vector<int>& weights, Grid& grid, float scale):
    SectionBase(scale), tilesetName(tilesetName), weights(weights), grid(grid){
 
    // move all components
@@ -348,8 +385,11 @@ void SectionTiles::display(){
    // display tileset file
    DrawTextEx(font, tilesetName.c_str(), messagePos, fontSize, spacing, WHITE);
 
-   // display tiles and change weights if on
+   // display tiles 
    for (auto& button : tileButtons){ button.display(); }
+
+   // display weight controls
+   for (auto& controls : weightControls){ controls.display(); }
 
    // show drop down if enabled
    if (dropDownEnabled){ showDropDown(); }
@@ -405,6 +445,7 @@ void SectionTiles::showDropDown(){
 
       // reset tile buttons
       tileButtons.clear();
+      weightControls.clear();
       createTileButtons();
    }
 }
@@ -413,6 +454,7 @@ void SectionTiles::createTileButtons(){
 
    // set up for button positions
    float startX{botBounds.x + botBounds.width*0.17f};
+   float startX2{botBounds.x};
    float startY{botBounds.y + tileSize*scale*0.1f};
 
    float addX{botBounds.width/3.0f};
@@ -422,14 +464,24 @@ void SectionTiles::createTileButtons(){
 
    // loop through tile ids
    for (const auto& [rotatingId,nonRotatingId] : nonRotatingIndex ){
+      
+      // create tile button
       tileButtons.push_back(ButtonTile(*grid.texture, startX, startY, scale, rotatable ? rotatingId : nonRotatingId, rotatingId));
 
+      // create tile weight controls
+      weightControls.push_back(SectionRange2(startX2, startY, rotatingId, 1, 200, scale/2.0f));
+
+      // set position for next button
       if ( ++i%3 == 0 ){
-         startX = botBounds.x + botBounds.width*0.17f;
+         startX  = botBounds.x + botBounds.width*0.17f;
+         startX2 = botBounds.x;
          startY += addY;
          i=0;
       }
-      else { startX += addX; }
+      else {
+         startX += addX;
+         startX2 += addX;
+      }
    }   
 
    // resize botBounds to contain all tiles

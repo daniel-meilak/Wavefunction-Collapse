@@ -131,7 +131,10 @@ void Grid::reset(){
 
    // swap out weights
    for (std::size_t i=0; i<weights.size(); i++){
-      currentWeights[i] = weights[i]*nextWeightSwitch[i];
+      if (!weightSwitch[i]    ){ currentWeights[i] = savedWeights[i]; }
+      if (!nextWeightSwitch[i]){ savedWeights[i] = currentWeights[i]; }
+
+      currentWeights[i] *= nextWeightSwitch[i];
    }
    weightSwitch = nextWeightSwitch;
 
@@ -412,7 +415,7 @@ void changeTileset(const std::string& newTileset, Grid& grid){
    leftRotation.clear();
    weights.clear();
    currentWeights.clear();
-   nextWeights.clear();
+   savedWeights.clear();
    weightSwitch = std::move(Bitset{}.set());
    nextWeightSwitch.set();
 
