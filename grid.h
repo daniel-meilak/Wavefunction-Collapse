@@ -140,9 +140,6 @@ void Grid::reset(){
 
    // set wait timer to 0
    waitTimer = 0.0f;
-
-   // if in debug
-   if (debug){ debugIt = getBitset.begin(); }
 }
 
 void Grid::update(){
@@ -202,7 +199,7 @@ void Grid::update(){
       std::discrete_distribution dist(adjustedWeights.begin(), adjustedWeights.end());
 
       // get bitset of new tile and orientation
-      currentBitset = Bitset{1ull<<possibilities[dist(gen)]};
+      currentBitset = Bitset{}.set(possibilities[dist(gen)]);
    }
 
    // get tile configuration 
@@ -263,7 +260,7 @@ void Grid::update(){
             if (!resolvingBitset[j]){ continue; }
 
             // left is current possibility, right is bitset of all tiles that connect to left
-            Bitset left{1ull<<j}, right;
+            Bitset left{Bitset{}.set(j)}, right;
 
             // rotate current tile so that we can look up left<->right connections
             rotate(left, i, dir::anticlockwise);
@@ -364,7 +361,7 @@ void Grid::draw(){
 
 void Grid::debugTileset(){
 
-   // stop whe it==last unique tile
+   // stop when it==last unique tile
    if (debugIt==getBitset.end()){ 
       reset();
       return;
@@ -376,7 +373,7 @@ void Grid::debugTileset(){
    reset();
 
    // set {0,0} to a unique tile
-   tileGrid[0][0] = state;
+   tileGrid[3][0] = state;
 
    // display all left<->right connections to current state
    Bitset connections = connectsTo[bitset];
@@ -387,13 +384,13 @@ void Grid::debugTileset(){
       if (!connections[i]){ continue; }
 
       // move to newline if there are many connections
-      if (j==gridWidth){
+      if (j==gridHeight){
          j=0;
          k++;
       }
 
       // set a grid tiles to show connections
-      tileGrid[j++][k] = getTile[1ull<<i];
+      tileGrid[j++][k] = getTile[Bitset{}.set(i)];
    }
 
    debugIt++;
