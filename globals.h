@@ -3,6 +3,7 @@
 #include<array>
 #include<bitset>
 #include<cstddef>
+#include<random>
 #include<string_view>
 #include<utility>
 
@@ -68,4 +69,8 @@ float sinceLastUpdate{};
 
 // selected tileset directory
 std::string tilesetDir{"campus"};
+
+// random numbers
+std::random_device rd;
+std::mt19937 gen(rd());
 

@@ -35,9 +35,6 @@ struct Grid{
    // map of number of connections for each tile. Only keeps track of uncollapsed tiles
    std::map<std::size_t,std::unordered_set<Point>> entropyList;
 
-   // random numbers
-   std::mt19937 gen;
-
    // grid update time
    int updateSpeed{30};
 
@@ -92,10 +89,6 @@ Grid::Grid(const std::string& tilesetDir): texture(textureStore.getPtr(pathToTex
 
    bitsetGrid = std::vector<std::vector<Bitset>>(gridHeight,std::vector<Bitset>(gridWidth,Bitset(std::string(uniqueTiles,'1'))));
    tileGrid = std::vector<std::vector<tileState>>(gridHeight, std::vector<tileState>(gridWidth));
-
-   std::random_device rd; // slow, high quality, random number to seed fast generator
-   
-   gen.seed(rd());
 
    // fill entropyList
    resetEntropy();
