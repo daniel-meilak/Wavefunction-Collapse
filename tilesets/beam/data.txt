@@ -1,0 +1,23 @@
+no rotation
+
+{1,50},{4,50},{4,50},{4,50},{2,50},{1,50}
+
+Empty left - {0,0},{1,2},{1,3},{2,0}
+Pipe left bot - {1,0},{2,1},{3,3},{4,1}
+Pipe left top - {1,1},{2,3},{3,2},{4,0}
+Pipe left full - {2,2},{3,0},{3,1},{5,0}
+
+{0,0} - Empty left
+{1,0},{1,1} - Empty left
+{1,2} - Pipe left top
+{1,3} - Pipe left bot
+{2,0} - Pipe left full
+{2,1} - Pipe left bot
+{2,2} - Empty left
+{2,3} - Pipe left top
+{3,0} - Pipe left bot
+{3,1} - Pipe left top
+{3,2},{3,3} - Pipe left full
+{4,0} - Pipe left bot
+{4,1} - Pipe left top
+{5,0} - Pipe left full
