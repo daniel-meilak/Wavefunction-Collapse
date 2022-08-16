@@ -47,7 +47,7 @@ struct Grid{
    // flag for full collapse
    bool collapsed{false};
 
-   // construct grid. Add texture ref to tiles, set up random number gen, choose initial starting point
+   // construct grid.
    Grid();
 
    // debugging tileset analysis. Shows left<->right connections for each unique tile
@@ -66,10 +66,11 @@ struct Grid{
    // pause for duration
    bool waiting();
 
-   // reset entropy
+   // reset entropy list (used to find next tile to collapse)
    void resetEntropy();
 };
 
+// place all tiles at maximum entropy
 void Grid::resetEntropy(){
 
    entropyList.clear();
@@ -82,6 +83,7 @@ void Grid::resetEntropy(){
    }
 }
 
+// analyze the chose tileset, create grid, fill entropies
 Grid::Grid(){
 
    // analyze tileset data
@@ -90,7 +92,7 @@ Grid::Grid(){
    bitsetGrid = std::vector<std::vector<Bitset>>(gridHeight,std::vector<Bitset>(gridWidth,Bitset(std::string(uniqueTiles,'1'))));
    tileGrid = std::vector<std::vector<tileState>>(gridHeight, std::vector<tileState>(gridWidth));
 
-   // fill entropyList
+   // fill entropyList (set all tiles to max)
    resetEntropy();
 
    // setup debug it
@@ -405,7 +407,7 @@ void changeTileset(const std::string& newTileset, Grid& grid){
    weights.clear();
    currentWeights.clear();
    savedWeights.clear();
-   weightSwitch = std::move(Bitset{}.set());
+   weightSwitch.set();
    nextWeightSwitch.set();
 
    // analyze tileset

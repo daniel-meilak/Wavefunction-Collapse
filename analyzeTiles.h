@@ -38,11 +38,11 @@ std::unordered_map<Bitset,Bitset> leftRotation;
 // vector of weights for each tile 
 std::vector<int> weights;              // original
 std::vector<int> currentWeights;       // used in current simulation
-std::vector<int> savedWeights;      // weights affected by range buttons
-auto weightSwitch = std::move(Bitset{}.set());  // turn tile on/off (use char to avoid bool specialization);
-auto nextWeightSwitch = std::move(Bitset{}.set());
+std::vector<int> savedWeights;         // weights affected by range buttons
+auto weightSwitch = Bitset{}.set();    // turn tile on/off (use char to avoid bool specialization);
+auto nextWeightSwitch = Bitset{}.set();
 
-// number of unique tiles with/without rotation
+// number of unique tiles (including rotations if possible)
 std::size_t uniqueTiles;
 
 // read information on tileset from file
@@ -72,7 +72,6 @@ void analyzeTiles(const std::string& filename){
       std::exit(EXIT_FAILURE);
    }
    std::getline(dataFile,line);
-   if (line.back() == '\r'){ line.pop_back(); }
 
    // create list of tiles in braket {a,b} and bitset (00010) form 
    int id{0};
@@ -114,14 +113,13 @@ void analyzeTiles(const std::string& filename){
       symmetryIndex.push_back(symmetry);
    }
    std::getline(dataFile, line);
-   if (line.back() == '\r'){ line.pop_back(); }
+
+   // set n unique Tiles
+   uniqueTiles = index;
 
    // copy weights over
    currentWeights = weights;
    savedWeights   = weights;
-
-   // set number of unique tiles including rotations
-   uniqueTiles = getBitset.size();
 
    // keep track of connection names for next part
    std::unordered_map<std::string, Bitset> connectionBitset; 
@@ -200,47 +198,12 @@ void analyzeTiles(const std::string& filename){
    }
 }
 
-// void analyzaWangTile(const std::string& filename){
-
-//    // load image
-//    Image tilesetImage = LoadImage(filename.c_str());
-
-//    // load colour array from image
-//    Color* tilesetColors = LoadImageColors(tilesetImage);
-
-//    // get number of tiles
-//    int nTiles = tilesetImage.width/tileSize;
-
-//    // create 3D vector to hold all border data. nTiles x 4 borders x tileSize
-//    std::vector<std::vector<std::vector<Color>>> tileBorderData(nTiles,std::vector<std::vector<Color>>(4,std::vector<Color>(tileSize)));
-
-//    // fill tileBorderData
-//    for (std::size_t i=0; i<tilesetImage.width*tilesetImage.height; i+=tileArea){
-
-//       std::size_t j=i/(tileSize*tileSize);
-      
-//       // fill all borders (bottom and left are reversed for consistency)
-//       for (std::size_t k=0, rightOffset=tileSize-1; k<tileSize; k++){
-//          tileBorderData[j][0][k] = tilesetColors[i + k];
-//          tileBorderData[j][1][k] = tilesetColors[i + rightOffset + k*tileSize];
-//          tileBorderData[j][2][k] = tilesetColors[i + (tileArea-1) - (rightOffset + k*tileSize)];
-//          tileBorderData[j][3][k] = tilesetColors[i + (tileArea-1) - k];
-//       }
-//    }
-
-
-
-//    // unload image and colours
-//    UnloadImage(tilesetImage);
-//    UnloadImageColors(tilesetColors);
-// }
-
 // rotate a unique tile clockwise. n: 0-0deg, 1-90deg, 2-180deg, 3-270deg
 void rotate(Bitset& tile, int n, bool clockwise){
    switch (n){
    case 0: break;
    case 1: tile = clockwise ? rightRotation[tile] : leftRotation[tile]; break;
-   case 2: tile =  leftRotation[leftRotation[tile]]; break;
+   case 2: tile = leftRotation[leftRotation[tile]]; break;
    case 3: tile = clockwise ? leftRotation[tile] : rightRotation[tile]; break;
    default:
       std::cerr << "Invalid rotation\n";

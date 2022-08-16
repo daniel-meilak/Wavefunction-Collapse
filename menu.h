@@ -30,7 +30,7 @@ struct MenuBase {
    // minimize/maximize button
    bool maximized{false};
 
-   MenuBase(Vector2 pos): bounds({pos.x,pos.y,0.0f,0.0f}){};
+   MenuBase(float x, float y): bounds({x,y,0.0f,0.0f}){};
 
    // move menu position
    void move(float newX, float newY);
@@ -51,7 +51,7 @@ struct MenuHorizontal : MenuBase{
 
    ButtonIcon button{textureStore.getRef("UI/open-close-h.png"), 0.0f, 0.0f, scale, maximized};
 
-   MenuHorizontal(Vector2 pos): MenuBase(pos){};
+   MenuHorizontal(float x, float y): MenuBase(x,y){};
 
    void display() override;
 
@@ -96,7 +96,7 @@ struct MenuVertical : MenuBase{
 
    ButtonIcon button{textureStore.getRef("UI/open-close-v.png"), 0.0f, 0.0f, scale, maximized};
 
-   MenuVertical(Vector2 pos): MenuBase(pos){};
+   MenuVertical(float x, float y): MenuBase(x,y){};
 
    void display() override;
 
@@ -142,7 +142,7 @@ void MenuVertical::addSection(Ts&&... args){
 // create a menu with a reset button, play/pause, and speed controls
 std::unique_ptr<MenuHorizontal> createControlsMenu(float x, float y, Grid& grid, std::function<void(Grid&)> reset, bool& playPause, int& speed){
 
-   auto menu = std::make_unique<MenuHorizontal>(Vector2{x,y});
+   auto menu = std::make_unique<MenuHorizontal>(x,y);
 
    menu->addSection<SectionBasicButton>("UI/rectangle-sheet.png", "Reset", grid, reset);
    menu->addSection<SectionBoolIcon>("UI/play-pause.png", playPause);
@@ -153,7 +153,7 @@ std::unique_ptr<MenuHorizontal> createControlsMenu(float x, float y, Grid& grid,
 
 std::unique_ptr<MenuVertical> createTilesMenu(float x, float y, std::string& filename, std::vector<int>& weights, Grid& grid){
 
-   auto menu = std::make_unique<MenuVertical>(Vector2{x,y});
+   auto menu = std::make_unique<MenuVertical>(x,y);
 
    menu->addSection<SectionTiles>(filename, weights, grid);
 
