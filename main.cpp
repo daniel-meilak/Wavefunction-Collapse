@@ -8,6 +8,7 @@
 #include"grid.h"
 #include"menu.h"
 #include"storage.h"
+#include"utils.h"
 
 #ifdef PLATFORM_WEB
     #include<emscripten/emscripten.h>
@@ -19,14 +20,15 @@ MenuControl* menusPtr;
 
 void UpdateDrawFrame();
 
-
-
 int main(){
 
     InitWindow(screenWidth, screenHeight, "Wavefunction Collapse");
 
+    // chose random tileset
+    tilesetDir = getRandomTileset();
+
     // create grid with tileset and data sheet
-    Grid grid(tilesetDir);
+    Grid grid;
     gridPtr = &grid;
 
     // create controlls and tile select menu

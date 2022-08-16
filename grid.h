@@ -24,7 +24,7 @@
 struct Grid{
 
    // tileset
-   Texture2D* texture;
+   Texture2D* texture{textureStore.getPtr(pathToTexture(tilesetDir))};
 
    // bitset grid
    std::vector<std::vector<Bitset>> bitsetGrid;
@@ -48,7 +48,7 @@ struct Grid{
    bool collapsed{false};
 
    // construct grid. Add texture ref to tiles, set up random number gen, choose initial starting point
-   Grid(const std::string& tilesetDir);
+   Grid();
 
    // debugging tileset analysis. Shows left<->right connections for each unique tile
    void debugTileset();
@@ -82,7 +82,7 @@ void Grid::resetEntropy(){
    }
 }
 
-Grid::Grid(const std::string& tilesetDir): texture(textureStore.getPtr(pathToTexture(tilesetDir))){
+Grid::Grid(){
 
    // analyze tileset data
    analyzeTiles(pathToData(tilesetDir));

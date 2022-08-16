@@ -68,7 +68,7 @@ Vector2 mousePos{};
 float sinceLastUpdate{};
 
 // selected tileset directory
-std::string tilesetDir{"campus"};
+std::string tilesetDir{};
 
 // random numbers
 std::random_device rd;
