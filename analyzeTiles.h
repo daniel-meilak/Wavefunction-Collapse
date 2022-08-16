@@ -87,7 +87,7 @@ void analyzeTiles(const std::string& filename){
    for (std::sregex_iterator i=begin; i!=end; ++i){
       
       std::vector<tileState> brackets{{id,0},{id,1},{id,2},{id,3}};
-      std::vector<Bitset> bits{(1ull<<index),(1ull<<(index+1)),(1ull<<(index+2)),(1ull<<(index+3))};
+      std::vector<Bitset> bits{Bitset{}.set(index), Bitset{}.set(index+1),Bitset{}.set(index+2),Bitset{}.set(index+3)};
       
       // get symmetry {Sym,_}
       int symmetry = std::stoi(i->str(1));

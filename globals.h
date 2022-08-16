@@ -33,7 +33,7 @@ constexpr int screenWidth{gridWidth*tileSize*scaling};
 constexpr int screenHeight{gridHeight*tileSize*scaling};
 
 // bitset max and alias
-constexpr std::size_t N=64;
+constexpr std::size_t N=128;
 using Bitset = std::bitset<N>;
 
 // cardinal directions (right, bottom, left, up)
@@ -67,5 +67,5 @@ Vector2 mousePos{};
 float sinceLastUpdate{};
 
 // selected tileset directory
-std::string tilesetDir{"knots"};
+std::string tilesetDir{"campus"};
 
