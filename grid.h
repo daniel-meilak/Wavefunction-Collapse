@@ -11,7 +11,6 @@
 #include<random>
 #include<unordered_set>
 #include<utility>
-#include<tuple>
 #include<vector>
 
 #include"raylib.h"
