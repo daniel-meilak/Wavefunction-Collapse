@@ -6,12 +6,15 @@ project (WFC VERSION 1.0)
 if (MSVC)
    add_compile_options(/Wall)
 else()
-   add_compile_options(-Wall -Werror -Wextra -pedantic)
+   add_compile_options(-Wall -Wextra)
 endif()
 
 #specift C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Find OpenGl
+find_package(OpenGL REQUIRED)
 
 # Dependencies
 find_package(raylib 4.2.0 QUIET) # QUIET or REQUIRED
@@ -57,7 +60,9 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # set executable
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} main.cpp)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "main.exe")
 
 # link raylib
 target_link_libraries(${PROJECT_NAME} raylib)
@@ -78,3 +83,10 @@ if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework Cocoa")
     target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
 endif()
+
+add_custom_command(TARGET ${PROJECT_NAME}
+                   POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy
+                   ${CMAKE_CURRENT_BINARY_DIR}/main.exe
+                   ${CMAKE_SOURCE_DIR}/main.exe
+                   COMMENT "Copying executable to project dir")

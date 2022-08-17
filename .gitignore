@@ -9,3 +9,5 @@ main.code-workspace
 *.data
 *.js
 *.wasm
+
+build/**
