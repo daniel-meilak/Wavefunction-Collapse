@@ -1,18 +1,20 @@
 # Wave Function Collapse using C++ and raylib
 
-This repo is my attempt at implementing a simple wave function collapse algorithm specifically for tilesets. It is inspired by the work of [Maxim Gumin](https://github.com/mxgmn/WaveFunctionCollapse).
+This repo is an implementation of a tiled wave function collapse algorithm. It is inspired by the work of [Maxim Gumin](https://github.com/mxgmn/WaveFunctionCollapse).
 
 The program includes hand made controls for changing the speed of the simulation, as well as swapping out the tilesets.
 
 ## Building:
 
-If built using Makefiles, this project requires [raylib](https://www.raylib.com/) to be preinstalled (with a working C++ compiler).
+If built using Makefiles, this project requires [raylib](https://www.raylib.com/) to be preinstalled (with a working C++ compiler). In the [Makefile](Makefile), make sure `RAYLIB_PATH` and `COMPILER_PATH` are set correctly.
 
-Alternatively, CMake can be used to build this project (working on WSL, Windows) and will download and compile raylib automatically. Requires a C++ compiler and OpenGl.
+Alternatively, CMake can be used to build this project and will download and compile raylib automatically. Requires a C++ compiler and OpenGl.
+
+Both options have been tested on Windows, using Mingw or MSVC, and WSL using g++.
 
 ## Demo:
 
-There is a playable version (compiled using emscripten) on [Itch.io](https://atiladhun.itch.io/wavefunction-collapse)!
+There is a playable version (compiled using [emscripten](https://emscripten.org/)) on [Itch.io](https://atiladhun.itch.io/wavefunction-collapse)!
 
 [![Itch.io Thumbnail](images/ItchThumbnail.png)](https://atiladhun.itch.io/wavefunction-collapse)
 

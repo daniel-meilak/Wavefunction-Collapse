@@ -29,7 +29,7 @@
 PLATFORM              ?= PLATFORM_DESKTOP
 
 # Define project variables
-PROJECT_NAME          ?= game
+PROJECT_NAME          ?= main
 PROJECT_VERSION       ?= 1.0
 PROJECT_BUILD_PATH    ?= .
 
