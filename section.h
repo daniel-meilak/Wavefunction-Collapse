@@ -56,14 +56,14 @@ struct SectionRangeBase : SectionBase {
    SectionRangeBase(int min, int max, float scale):
       SectionBase(scale), min(min), max(max){};
 
-   void moveButtons(float x, float y);
+   void moveButtons();
 
    virtual void display() = 0;
 
    virtual ~SectionRangeBase(){};   
 };
 
-void SectionRangeBase::moveButtons(float x, float y){
+void SectionRangeBase::moveButtons(){
 
    // buttons are vertically centred and 5% away from border
    leftButton.bounds.x  = bounds.x + 0.05f*bounds.width;
@@ -97,7 +97,7 @@ SectionRange1::SectionRange1(float x, float y, std::string filename, std::string
 
       bounds = {x,y,source.width*scale, source.height*scale};
 
-      moveButtons(x,y);
+      moveButtons();
 }
 
 void SectionRange1::display(){
@@ -147,7 +147,7 @@ SectionRange2::SectionRange2(float x, float y, int tileIndex, int min, int max, 
    fontSize -= 2.0f;
 
    // move buttons
-   moveButtons(x,y);
+   moveButtons();
 }
 
 void SectionRange2::display(){
