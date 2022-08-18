@@ -75,16 +75,6 @@ endif()
 # link raylib
 target_link_libraries(${PROJECT_NAME} raylib)
 
-# Web Configurations
-if (${PLATFORM} STREQUAL "Web")
-    # Tell Emscripten to build an example.html file.
-    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
-
-    # switch build type to release
-    set(CMAKE_BUILD_TYPE Release)
-    set(CMAKE_EXE_LINKER_FLAGS "-s USE_GLFW=3")
-endif()
-
 # Checks if OSX and links appropriate frameworks (Only required on MacOS)
 if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework IOKit")
