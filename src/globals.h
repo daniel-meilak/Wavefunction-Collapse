@@ -3,7 +3,6 @@
 #include<array>
 #include<bitset>
 #include<cstddef>
-#include<filesystem>
 #include<random>
 #include<string_view>
 #include<utility>
@@ -45,7 +44,7 @@ constexpr std::array<Point,4> cardinals{Point(1,0),Point(0,1),Point(-1,0),Point(
 constexpr int maxTextures{64};
 
 // tileset directory and file names
-constexpr const char* rootPath{R"(.)"};
+constexpr const char* rootPath{R"(./)"};
 constexpr const char* tilesetBaseDir{"tilesets/"};
 constexpr const char* tilesetFile{"/tileset.png"};
 constexpr const char* tilesetDataFile{"/data.txt"};
