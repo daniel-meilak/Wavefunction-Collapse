@@ -8,7 +8,7 @@ The program includes hand made controls for changing the speed of the simulation
 
 If built using Makefiles, this project requires [raylib](https://www.raylib.com/) to be preinstalled (with a working C++ compiler).
 
-Alternatively, CMake can be used to build this project and will download and compile raylib automatically. Requires a C++ compiler and OpenGl.
+Alternatively, CMake can be used to build this project and will download and compile raylib automatically. Requires a C++ compiler and OpenGl. (Tested and working on WSL)
 
 ## Demo:
 

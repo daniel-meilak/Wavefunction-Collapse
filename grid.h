@@ -23,7 +23,7 @@
 struct Grid{
 
    // tileset
-   Texture2D* texture{textureStore.getPtr(pathToTexture(tilesetDir))};
+   Texture2D* texture{textureStore.getPtr(pathToTexture())};
 
    // bitset grid
    std::vector<std::vector<Bitset>> bitsetGrid;
@@ -86,7 +86,7 @@ void Grid::resetEntropy(){
 Grid::Grid(){
 
    // analyze tileset data
-   analyzeTiles(pathToData(tilesetDir));
+   analyzeTiles();
 
    bitsetGrid = std::vector<std::vector<Bitset>>(gridHeight,std::vector<Bitset>(gridWidth,Bitset(std::string(uniqueTiles,'1'))));
    tileGrid = std::vector<std::vector<tileState>>(gridHeight, std::vector<tileState>(gridWidth));
@@ -95,7 +95,7 @@ Grid::Grid(){
    resetEntropy();
 
    // setup debug it
-   if (debug){ debugIt = getBitset.begin(); }
+   if constexpr (debug){ debugIt = getBitset.begin(); }
 }
 
 bool Grid::waiting(){
@@ -148,7 +148,7 @@ void Grid::update(){
    sinceLastUpdate=0.0f;
 
    // debug tileset
-   if (debug){
+   if constexpr (debug){
       debugTileset();
 
       // set grid speed back to zero
@@ -206,7 +206,7 @@ void Grid::update(){
    // check if wavefunction is fully collapsed
    if (entropyList.empty()){
 
-      if (debug){ std::cout << "Grid is fully Collapsed!\n"; }
+      if constexpr (debug){ std::cout << "Grid is fully Collapsed!\n"; }
 
       // pause grid for 5 seconds
       waitTimer = waitTime;
@@ -273,7 +273,7 @@ void Grid::update(){
          newPossibilities &= weightSwitch;
 
          // error if no tile can be placed
-         if (debug && newPossibilities.count()==0){
+         if constexpr (debug && newPossibilities.count()==0){
             std::cout << "Problem Here?" << std::endl;
          }
 
@@ -294,9 +294,9 @@ void Grid::update(){
 
          // if number of possibilities has changed, update entropyList
          if (newCount != oldCount){
-            auto it = entropyList.find(oldCount);
-            it->second.erase(nearPos);
-            if (it->second.empty()){ entropyList.erase(it); }
+            auto iter = entropyList.find(oldCount);
+            iter->second.erase(nearPos);
+            if (iter->second.empty()){ entropyList.erase(iter); }
             entropyList[newCount].insert(nearPos);
          }
 
@@ -342,7 +342,7 @@ void Grid::draw(){
       }
    }
 
-   if (debug){
+   if constexpr (debug){
       for (int i=0; i<gridHeight; i++){
          DrawLine(0.0f, static_cast<float>(i*tileScaled), gridWidth*tileScaled, static_cast<float>(i*tileScaled), RED);
       }   
@@ -409,14 +409,17 @@ void changeTileset(const std::string& newTileset, Grid& grid){
    weightSwitch.set();
    nextWeightSwitch.set();
 
+   // swap out tileset
+   tilesetDir = newTileset;
+
    // analyze tileset
-   analyzeTiles(pathToData(newTileset));
+   analyzeTiles();
 
    // change grid texture pointer
-   grid.texture = textureStore.getPtr(pathToTexture(newTileset));
+   grid.texture = textureStore.getPtr(pathToTexture());
 
    // in debug reset grid.debugIt
-   if (debug){ grid.debugIt = getBitset.begin(); }
+   if constexpr (debug){ grid.debugIt = getBitset.begin(); }
 
    // reset grid
    grid.reset();

@@ -53,12 +53,14 @@ struct SectionRangeBase : SectionBase {
    int min;
    int max;
 
-   SectionRangeBase(float x, float y, int min, int max, float scale):
+   SectionRangeBase(int min, int max, float scale):
       SectionBase(scale), min(min), max(max){};
 
    void moveButtons(float x, float y);
 
    virtual void display() = 0;
+
+   virtual ~SectionRangeBase(){};   
 };
 
 void SectionRangeBase::moveButtons(float x, float y){
@@ -91,7 +93,7 @@ struct SectionRange1 : SectionRangeBase {
 };
 
 SectionRange1::SectionRange1(float x, float y, std::string filename, std::string message, int& variable, int min, int max, float scale):
-   SectionRangeBase(x,y,min,max,scale), texture(textureStore.getRef(filename.c_str())), variable(variable), message(message){
+   SectionRangeBase(min,max,scale), texture(textureStore.getRef(filename.c_str())), variable(variable), message(message){
 
       bounds = {x,y,source.width*scale, source.height*scale};
 
@@ -131,7 +133,7 @@ struct SectionRange2 : SectionRangeBase {
    void display() override;
 };
 
-SectionRange2::SectionRange2(float x, float y, int tileIndex, int min, int max, float scale): SectionRangeBase(x,y,min,max,scale), tileIndex(tileIndex){
+SectionRange2::SectionRange2(float x, float y, int tileIndex, int min, int max, float scale): SectionRangeBase(min,max,scale), tileIndex(tileIndex){
 
    // bounds
    bounds = {x,y - leftButton.bounds.height*0.5f,leftButton.bounds.width*4.0f,leftButton.bounds.height};
@@ -327,9 +329,6 @@ struct SectionTiles : SectionBase {
    std::vector<ButtonHold> dropDownOptions;
    ButtonHold dropDownBack{dropTexture,0.0f,0.0f,scale};
 
-   // weights
-   std::vector<int>& weights;
-
    // list of tileset files
    std::unordered_set<std::string> tilesets;
 
@@ -343,7 +342,7 @@ struct SectionTiles : SectionBase {
    // bool for showing drop down menu
    bool dropDownEnabled{false};
 
-   SectionTiles(float x, float y, std::string& tilesetName, std::vector<int>& weights, Grid& grid, float scale);
+   SectionTiles(float x, float y, std::string& tilesetName, Grid& grid, float scale);
 
    void display() override;
 
@@ -354,8 +353,8 @@ struct SectionTiles : SectionBase {
    void createTileButtons();
 };
 
-SectionTiles::SectionTiles(float x, float y, std::string& tilesetName, std::vector<int>& weights, Grid& grid, float scale):
-   SectionBase(scale), tilesetName(tilesetName), weights(weights), grid(grid){
+SectionTiles::SectionTiles(float x, float y, std::string& tilesetName, Grid& grid, float scale):
+   SectionBase(scale), tilesetName(tilesetName), grid(grid){
 
    // move all components
    move(x,y);

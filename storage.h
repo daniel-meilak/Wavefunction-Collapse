@@ -2,6 +2,7 @@
 
 #include<array>
 #include<cstdlib>
+#include<cstddef>
 #include<filesystem>
 #include<iostream>
 #include<string>
@@ -20,7 +21,7 @@ struct Storage{
 
 private:
 
-   int index{-1};
+   std::size_t index{0};
    std::array<T,maxTextures> textures;
 
    std::unordered_map<std::string,int> textureIndex;
@@ -49,7 +50,7 @@ Texture2D& Storage<Texture2D>::getRef(std::string filename){
       }
 
       // increment texture index and check if limit reached
-      if (static_cast<size_t>(++index) == textures.size()){
+      if (index == textures.size()){
          std::cerr << "Texture storage limit reached. Cannot load \"" << filename << "\".\n";
          std::exit(EXIT_FAILURE);
       }
@@ -59,7 +60,8 @@ Texture2D& Storage<Texture2D>::getRef(std::string filename){
       // add to uniqueTextures in case of future requests
       textureIndex[filename] = index;
 
-      return textures[index];
+      // return reference to texture and post increment index
+      return textures[index++];
    }
 }
 
@@ -80,7 +82,7 @@ Texture2D* Storage<Texture2D>::getPtr(std::string filename){
       }
 
       // increment texture index and check if limit reached
-      if (static_cast<size_t>(++index) == textures.size()){
+      if (index == textures.size()){
          std::cerr << "Texture storage limit reached. Cannot load \"" << filename << "\".\n";
          std::exit(EXIT_FAILURE);
       }
@@ -90,14 +92,15 @@ Texture2D* Storage<Texture2D>::getPtr(std::string filename){
       // add to uniqueTextures in case of future requests
       textureIndex[filename] = index;
 
-      return &textures[index];
+      // return pointer to texture and post increment index
+      return &textures[index++];
    }
 }
 
 template<>
 void Storage<Texture2D>::unloadAll(){
 
-   for (int i=0; i<=index; i++){ 
+   for (std::size_t i=0; i<=index; i++){ 
       UnloadTexture(textures[i]); 
    }
 }
@@ -121,7 +124,7 @@ Font& Storage<Font>::getRef(std::string filename){
       }
 
       // increment texture index and check if limit reached
-      if (static_cast<size_t>(++index) == textures.size()){
+      if (index == textures.size()){
          std::cerr << "Font storage limit reached. Cannot load \"" << filename << "\".\n";
          std::exit(EXIT_FAILURE);
       }
@@ -131,14 +134,15 @@ Font& Storage<Font>::getRef(std::string filename){
       // add to uniqueTextures in case of future requests
       textureIndex[filename] = index;
 
-      return textures[index];
+      // return reference to texture and post increment index
+      return textures[index++];
    }
 }
 
 template<>
 void Storage<Font>::unloadAll(){
 
-   for (int i=0; i<=index; i++){ 
+   for (std::size_t i=0; i<=index; i++){ 
       UnloadFont(textures[i]); 
    }
 }

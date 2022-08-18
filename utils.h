@@ -24,7 +24,7 @@ std::string getRandomTileset(){
 }
 
 // get full path to tilesetFile
-std::string pathToTexture(const std::string& tilesetDir){
+std::string pathToTexture(){
    std::string result;
    result.append(tilesetBaseDir);
    result += '/' + tilesetDir + '/';
@@ -34,7 +34,7 @@ std::string pathToTexture(const std::string& tilesetDir){
 }
 
 // get full path to tilesetData
-std::string pathToData(const std::string& tilesetDir){
+std::string pathToData(){
    std::string result;
    result.append(tilesetBaseDir);
    result += '/' + tilesetDir + '/';

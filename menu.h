@@ -37,6 +37,8 @@ struct MenuBase {
 
    // display menu (sections, buttons and min/max)
    virtual void display();
+
+   virtual ~MenuBase(){}; 
 };
 
 // display menu (sections, buttons and min/max)
@@ -151,11 +153,11 @@ std::unique_ptr<MenuHorizontal> createControlsMenu(float x, float y, Grid& grid,
    return menu;
 }
 
-std::unique_ptr<MenuVertical> createTilesMenu(float x, float y, std::string& filename, std::vector<int>& weights, Grid& grid){
+std::unique_ptr<MenuVertical> createTilesMenu(float x, float y, std::string& filename, Grid& grid){
 
    auto menu = std::make_unique<MenuVertical>(x,y);
 
-   menu->addSection<SectionTiles>(filename, weights, grid);
+   menu->addSection<SectionTiles>(filename, grid);
 
    return menu;
 }

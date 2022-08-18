@@ -62,7 +62,11 @@ endif()
 # set executable
 add_executable(${PROJECT_NAME} main.cpp)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "main.exe")
+if (WIN32)
+   set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "main")
+else()
+   set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "main.exe")
+endif()
 
 # link raylib
 target_link_libraries(${PROJECT_NAME} raylib)

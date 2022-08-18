@@ -41,7 +41,7 @@ using Bitset = std::bitset<N>;
 constexpr std::array<Point,4> cardinals{Point(1,0),Point(0,1),Point(-1,0),Point(0,-1)};
 
 // Textures
-constexpr int maxTextures{50};
+constexpr int maxTextures{64};
 
 // tileset directory and file names
 constexpr std::string_view tilesetBaseDir{"tilesets"};

@@ -14,6 +14,7 @@
 
 #include"globals.h"
 #include"point.h"
+#include"utils.h"
 
 // rotatability of current tileset
 bool rotatable{true};
@@ -48,11 +49,11 @@ std::size_t uniqueTiles;
 // read information on tileset from file
 // tile properties are represented in braket notation int the file {a,b}. a=tile index, b=orientation
 // for fast calculations, this will be converted into a unique bitset for each tile e.g. {0,0}->0001
-void analyzeTiles(const std::string& filename){
+void analyzeTiles(){
 
-   std::ifstream dataFile(filename);
+   std::ifstream dataFile(pathToData());
    if (!dataFile.is_open()){
-      std::cerr << "Could not open \"" << filename << "\". Exiting.\n";
+      std::cerr << "Could not open \"" << pathToData() << "\". Exiting.\n";
       std::exit(EXIT_FAILURE);
    }
 
@@ -68,7 +69,7 @@ void analyzeTiles(const std::string& filename){
    if (line=="no rotation"){ rotatable = false; }
    else if (line=="rotate"){ rotatable = true;  }
    else {
-      std::cerr << "Rotation type could not be found in \"" << filename << "\".\n";
+      std::cerr << "Rotation type could not be found in \"" << pathToData() << "\".\n";
       std::exit(EXIT_FAILURE);
    }
    std::getline(dataFile,line);
@@ -140,8 +141,8 @@ void analyzeTiles(const std::string& filename){
 
       // use regex to get each unique tile
       // get matches from beginning to end of line 
-      auto begin = std::sregex_iterator(line.begin(), line.end(), tileIndices);
-      auto end   = std::sregex_iterator();
+      begin = std::sregex_iterator(line.begin(), line.end(), tileIndices);
+      end   = std::sregex_iterator();
 
       for (std::sregex_iterator i=begin; i!=end; ++i){
          connection.push_back(getBitset[{std::stoi(i->str(1)),std::stoi(i->str(2))}]);
