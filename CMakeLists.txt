@@ -88,9 +88,9 @@ if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
 endif()
 
-add_custom_command(TARGET ${PROJECT_NAME}
-                   POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy
-                   ${CMAKE_CURRENT_BINARY_DIR}/main.exe
-                   ${CMAKE_SOURCE_DIR}/main.exe
-                   COMMENT "Copying executable to project dir")
+# add_custom_command(TARGET ${PROJECT_NAME}
+#                    POST_BUILD
+#                    COMMAND ${CMAKE_COMMAND} -E copy
+#                    ${CMAKE_CURRENT_BINARY_DIR}/main.exe
+#                    ${CMAKE_SOURCE_DIR}/main.exe
+#                    COMMENT "Copying executable to project dir")
