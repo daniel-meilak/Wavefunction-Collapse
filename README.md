@@ -8,7 +8,7 @@ The program includes hand made controls for changing the speed of the simulation
 
 If built using Makefiles, this project requires [raylib](https://www.raylib.com/) to be preinstalled (with a working C++ compiler).
 
-Alternatively, CMake can be used to build this project (working on WSL, Windows) and will download and compile raylib automatically. Requires a C++ compiler and OpenGl. The executable **must be moved to the root directoy**, otherwise the tileset files cannot be read.
+Alternatively, CMake can be used to build this project (working on WSL, Windows) and will download and compile raylib automatically. Requires a C++ compiler and OpenGl.
 
 ## Demo:
 
@@ -31,6 +31,3 @@ The `data.txt` files included with each texture are in a custom format. I may ch
 ![Screenshot of knot tileset and tile menu](images/Screenshot2.png)
 
 ![Screenshot of pipe tileset and control menu](images/Screenshot3.png)
-
-### To do:
-- Fix paths in CMake executables so that they work automatically from build directory.

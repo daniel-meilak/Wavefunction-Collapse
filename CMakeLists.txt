@@ -17,20 +17,21 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 find_package(OpenGL REQUIRED)
 
 # Dependencies
-find_package(raylib 4.2.0 QUIET) # QUIET or REQUIRED
+find_package(raylib 4.0.0 QUIET) # QUIET or REQUIRED
 if (NOT raylib_FOUND) # If there's none, fetch and build raylib
-  include(FetchContent)
-  FetchContent_Declare(
-    raylib
-    URL https://github.com/raysan5/raylib/archive/refs/tags/4.0.0.tar.gz
-  )
-  FetchContent_GetProperties(raylib)
-  if (NOT raylib_POPULATED) # Have we downloaded raylib yet?
-    set(FETCHCONTENT_QUIET NO)
-    FetchContent_Populate(raylib)
-    set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # don't build the supplied examples
-    add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
-  endif()
+   include(FetchContent)
+   FetchContent_Declare(
+      raylib
+      GIT_REPOSITORY   https://github.com/raysan5/raylib.git
+      GIT_TAG          35c777ef2ccdad0b3a94b508ec13df5f6cd9ea49
+   )
+   FetchContent_GetProperties(raylib)
+   if (NOT raylib_POPULATED) # Have we downloaded raylib yet?
+      set(FETCHCONTENT_QUIET NO)
+      FetchContent_Populate(raylib)
+      set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # don't build the supplied examples
+      add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
+   endif()
 endif()
 
 # enable interprocedural optimization if availible
@@ -59,8 +60,11 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build." FORCE)
 endif()
 
+# condfigure globals header to use absolute path to root dir
+configure_file(src/globals.h.in ${PROJECT_SOURCE_DIR}/src/globals.h)
+
 # set executable
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp)
 
 if (WIN32)
    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "main")
@@ -87,10 +91,3 @@ if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework Cocoa")
     target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
 endif()
-
-# add_custom_command(TARGET ${PROJECT_NAME}
-#                    POST_BUILD
-#                    COMMAND ${CMAKE_COMMAND} -E copy
-#                    ${CMAKE_CURRENT_BINARY_DIR}/main.exe
-#                    ${CMAKE_SOURCE_DIR}/main.exe
-#                    COMMENT "Copying executable to project dir")

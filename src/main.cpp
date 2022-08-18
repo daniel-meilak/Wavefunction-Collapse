@@ -25,7 +25,7 @@ int main(){
     InitWindow(screenWidth, screenHeight, "Wavefunction Collapse");
 
     // chose random tileset
-    tilesetDir = getRandomTileset();
+    tilesetDir = setUpTileset();
 
     // create grid with tileset and data sheet
     Grid grid;

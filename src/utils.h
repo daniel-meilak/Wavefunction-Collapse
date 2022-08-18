@@ -7,8 +7,11 @@
 
 #include"globals.h"
 
-// chose starting tileset
-std::string getRandomTileset(){
+// chose starting tileset, also change directory to project root
+std::string setUpTileset(){
+
+   // set current directory
+   std::filesystem::current_path(rootPath);
 
    std::vector<std::filesystem::path> tilesets;
 
@@ -25,22 +28,12 @@ std::string getRandomTileset(){
 
 // get full path to tilesetFile
 std::string pathToTexture(){
-   std::string result;
-   result.append(tilesetBaseDir);
-   result += '/' + tilesetDir + '/';
-   result.append(tilesetFile);
-
-   return result; 
+   return std::string{tilesetBaseDir + tilesetDir + tilesetFile}; 
 }
 
 // get full path to tilesetData
 std::string pathToData(){
-   std::string result;
-   result.append(tilesetBaseDir);
-   result += '/' + tilesetDir + '/';
-   result.append(tilesetDataFile);
-
-   return result; 
+   return std::string{tilesetBaseDir + tilesetDir + tilesetDataFile}; 
 }
 
 // print state

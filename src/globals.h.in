@@ -44,9 +44,10 @@ constexpr std::array<Point,4> cardinals{Point(1,0),Point(0,1),Point(-1,0),Point(
 constexpr int maxTextures{64};
 
 // tileset directory and file names
-constexpr std::string_view tilesetBaseDir{"tilesets"};
-constexpr std::string_view tilesetFile{"tileset.png"};
-constexpr std::string_view tilesetDataFile{"data.txt"};
+constexpr const char* rootPath{R"(${PROJECT_SOURCE_DIR}/)"};
+constexpr const char* tilesetBaseDir{"tilesets/"};
+constexpr const char* tilesetFile{"/tileset.png"};
+constexpr const char* tilesetDataFile{"/data.txt"};
 
 // wait time after a grid collapse
 constexpr float waitTime{5.0f};
@@ -55,7 +56,7 @@ constexpr float waitTime{5.0f};
 constexpr bool debug{false};
 
 //-----------------------------------
-// Variable
+// Variables
 //-----------------------------------
 
 // clearer names for rotate() 
