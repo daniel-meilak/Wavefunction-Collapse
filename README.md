@@ -14,7 +14,7 @@ Alternatively, CMake can be used to build this project (working on WSL, Windows)
 
 There is a playable version (compiled using emscripten) on [Itch.io](https://atiladhun.itch.io/wavefunction-collapse)!
 
-![Itch.io Thumbnail](images/ItchThumbnail.png)
+[![Itch.io Thumbnail](images/ItchThumbnail.png)](https://atiladhun.itch.io/wavefunction-collapse)
 
 ## Details:
 
