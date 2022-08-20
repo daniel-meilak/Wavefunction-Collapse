@@ -2,6 +2,7 @@
 *.dsym
 main
 .vscode/*
+.vs/**
 main.code-workspace
 *.dll
 
@@ -11,3 +12,6 @@ main.code-workspace
 *.wasm
 
 build/**
+out/**
+
+CMakeSettings.json
