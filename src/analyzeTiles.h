@@ -20,10 +20,10 @@
 bool rotatable{true};
 
 // index lookup for non rotating tilesets
-std::map<int,int> nonRotatingIndex;
+std::map<std::size_t,std::size_t> nonRotatingIndex;
 
 // vector of symmetries
-std::vector<int> symmetryIndex;
+std::vector<std::size_t> symmetryIndex;
 
 // map of tile index <-> bitset e.g. {0,1}<->[0001]
 std::map<tileState, Bitset> getBitset;
@@ -75,8 +75,7 @@ void analyzeTiles(){
    std::getline(dataFile,line);
 
    // create list of tiles in braket {a,b} and bitset (00010) form 
-   int id{0};
-   std::size_t index{0};
+   std::size_t id{ 0 }, index{0};
    std::getline(dataFile,line);
    if (line.back() == '\r'){ line.pop_back(); }
 
@@ -90,12 +89,12 @@ void analyzeTiles(){
       std::vector<Bitset> bits{Bitset{}.set(index), Bitset{}.set(index+1),Bitset{}.set(index+2),Bitset{}.set(index+3)};
       
       // get symmetry {Sym,_}
-      int symmetry = std::stoi(i->str(1));
+      std::size_t symmetry = std::stoull(i->str(1));
 
       // save index of unique tiles ignoring rotations
       nonRotatingIndex[id] = index;
 
-      for (int j=0; j<symmetry; j++){
+      for (std::size_t j=0; j<symmetry; j++){
          
          // create maps from tileState<->bitset
          getBitset[brackets[j]] = bits[j];
@@ -106,7 +105,7 @@ void analyzeTiles(){
          leftRotation[bits[(j+1)%symmetry]] = bits[j];
 
          // fill weights for each unique tile
-         weights.push_back(std::stof(i->str(2)));
+         weights.push_back(std::stoi(i->str(2)));
       }
 
       id++;
@@ -127,7 +126,7 @@ void analyzeTiles(){
 
    // create bitsets for named connections
    while (std::getline(dataFile,line)){
-      if (line.back() == '\r'){ line.pop_back(); }
+      if (!line.empty() && line.back() == '\r'){ line.pop_back(); }
 
       // stop at empty line
       if (line.empty()){ break; }
@@ -145,7 +144,7 @@ void analyzeTiles(){
       end   = std::sregex_iterator();
 
       for (std::sregex_iterator i=begin; i!=end; ++i){
-         connection.push_back(getBitset[{std::stoi(i->str(1)),std::stoi(i->str(2))}]);
+         connection.push_back(getBitset[{std::stoull(i->str(1)),std::stoull(i->str(2))}]);
       }
 
       // create bitset for connection
@@ -174,7 +173,7 @@ void analyzeTiles(){
 
    // finally get leftright connections for each tile
    while (getline(dataFile,line)){
-      if (line.back() == '\r'){ line.pop_back(); }
+      if (!line.empty() && line.back() == '\r'){ line.pop_back(); }
 
       // stop at empty line
       if (line.empty()){ break; }
@@ -184,8 +183,8 @@ void analyzeTiles(){
       std::string name  = line.substr(pos+2);
 
       // use regex to iterate through lines with multiple unique tiles on left
-      auto begin = std::sregex_iterator(line.begin(), line.end(), tileIndices);
-      auto end   = std::sregex_iterator();
+      begin = std::sregex_iterator(line.begin(), line.end(), tileIndices);
+      end   = std::sregex_iterator();
 
       for (std::sregex_iterator i=begin; i!=end; ++i){
          if (!connectionBitset.contains(name)){
@@ -193,14 +192,14 @@ void analyzeTiles(){
             std::exit(EXIT_FAILURE);
          }
          
-         Bitset bits = getBitset[{std::stoi(i->str(1)),std::stoi(i->str(2))}];
+         Bitset bits = getBitset[{std::stoull(i->str(1)),std::stoull(i->str(2))}];
          connectsTo[bits] = connectionBitset[name];
       }
    }
 }
 
 // rotate a unique tile clockwise. n: 0-0deg, 1-90deg, 2-180deg, 3-270deg
-void rotate(Bitset& tile, int n, bool clockwise){
+void rotate(Bitset& tile, std::size_t n, bool clockwise){
    switch (n){
    case 0: break;
    case 1: tile = clockwise ? rightRotation[tile] : leftRotation[tile]; break;

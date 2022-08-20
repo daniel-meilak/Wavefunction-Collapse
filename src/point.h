@@ -1,5 +1,6 @@
 #pragma once
 
+#include<cstddef>
 #include<cmath>
 #include<compare> // C++20
 #include<functional>
@@ -26,7 +27,7 @@ struct Point_t{
 };
 
 using Point = Point_t<int>;
-using tileState = Point;
+using tileState = Point_t<std::size_t>;
 
 //================================================================
 // Member functions

@@ -3,12 +3,14 @@
 #include<algorithm>
 #include<array>
 #include<cmath>
+#include<cstddef>
 #include<functional>
 #include<numeric>
 #include<vector>
 
 #include"raylib.h"
 
+#include"analyzeTiles.h"
 #include"globals.h"
 #include"storage.h"
 #include"utils.h"
@@ -148,13 +150,13 @@ struct ButtonTile : ButtonBase{
 
    Rectangle border{};
 
-   ButtonTile(Texture& texture, float x, float y, float scale, float tileId, int rotatingId): ButtonBase(texture,scale){
+   ButtonTile(Texture& texture, float x, float y, float scale, float tileId, std::size_t rotatingId): ButtonBase(texture,scale){
       source = {tileId*tileSize, 0.0, static_cast<float>(tileSize), static_cast<float>(tileSize)};
       bounds = {x, y, tileSize*scale*0.5f, tileSize*scale*0.5f};
       border = {x-1.0f, y-1.0f, bounds.width+2.0f, bounds.height+2.0f};
 
       // create bitset of controlled tiles
-      for (int i=0; i<symmetryIndex[rotatingId]; i++){
+      for (std::size_t i=0; i<symmetryIndex[rotatingId]; i++){
          controlledTiles.set(nonRotatingIndex[rotatingId]+i);
       }
    };
@@ -183,6 +185,7 @@ void ButtonTile::display(){
       case 0: color = WHITE; break;
       case 1: color = LIGHTGRAY; break;
       case 2: color = GRAY; break;
+      default: color = RED; break;
    }
    
    DrawTexturePro(texture, source, bounds, {}, 0.0f, on ? color : DARKGRAY);

@@ -43,7 +43,7 @@ struct SectionRangeBase : SectionBase {
    // font for displaying value
    float fontSize{font.baseSize*scale};
    float spacing{1.0f*scale};
-   Vector2 messagePos;
+   Vector2 messagePos{};
 
    // associated buttons
    ButtonHold leftButton{textureStore.getRef("UI/left-arrow.png"), 0.0f, 0.0f, scale, true};
@@ -126,20 +126,20 @@ struct SectionRange2 : SectionRangeBase {
 
    std::vector<int*> controlledWeights;
 
-   int tileIndex;
+   std::size_t tileIndex;
 
-   SectionRange2(float x, float y, int tileIndex, int min, int max, float scale);
+   SectionRange2(float x, float y, std::size_t tileIndex, int min, int max, float scale);
 
    void display() override;
 };
 
-SectionRange2::SectionRange2(float x, float y, int tileIndex, int min, int max, float scale): SectionRangeBase(min,max,scale), tileIndex(tileIndex){
+SectionRange2::SectionRange2(float x, float y, std::size_t tileIndex, int min, int max, float scale): SectionRangeBase(min,max,scale), tileIndex(tileIndex){
 
    // bounds
    bounds = {x,y - leftButton.bounds.height*0.5f,leftButton.bounds.width*4.0f,leftButton.bounds.height};
 
    // fill controlledWeights
-   for (int i=0; i<symmetryIndex[tileIndex]; i++){
+   for (std::size_t i=0; i<symmetryIndex[tileIndex]; i++){
       controlledWeights.push_back(&currentWeights[nonRotatingIndex[tileIndex] + i]);
    }
 

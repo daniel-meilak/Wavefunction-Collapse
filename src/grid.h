@@ -174,14 +174,15 @@ void Grid::update(){
    else { std::sample(tiles.begin(), tiles.end(), &currentPos, 1, gen); }
 
    // aliases for convenience
-   Bitset& currentBitset = bitsetGrid[currentPos.y][currentPos.x];
-   tileState& currentTile = tileGrid[currentPos.y][currentPos.x];
+   Bitset& currentBitset = bitsetGrid[static_cast<std::size_t>(currentPos.y)][static_cast<std::size_t>(currentPos.x)];
+   tileState& currentTile = tileGrid[static_cast<std::size_t>(currentPos.y)][static_cast<std::size_t>(currentPos.x)];
 
    // if there are multiple possibilities
    if (entropy!=1){
       
       // get all possible unique tiles to collapse to and set up weights
-      std::vector<int> possibilities, adjustedWeights;
+      std::vector<std::size_t> possibilities;
+      std::vector<int> adjustedWeights;
       for (std::size_t i=0; i<uniqueTiles; i++){
          if (currentBitset[i]){
             possibilities.push_back(i);
@@ -232,7 +233,7 @@ void Grid::update(){
       Bitset& resolvingBitset = bitsetGrid[resolvingPos.y][resolvingPos.x];
 
       // propagate possibilities for neighbours
-      for (int i=0; i<4; i++){
+      for (std::size_t i=0; i<4; i++){
 
          // get position of neighbour
          Point nearPos = resolvingPos + cardinals[i];

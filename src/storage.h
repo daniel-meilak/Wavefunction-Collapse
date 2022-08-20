@@ -22,9 +22,9 @@ struct Storage{
 private:
 
    std::size_t index{0};
-   std::array<T,maxTextures> textures;
+   std::array<T, maxTextures> textures{};
 
-   std::unordered_map<std::string,int> textureIndex;
+   std::unordered_map<std::string,std::size_t> textureIndex;
 
 };
 
