@@ -67,14 +67,11 @@ void UpdateDrawFrame(){
     BeginDrawing();
     ClearBackground(RAYWHITE);
 
-    // reset on completion
-    if (gridPtr->collapsed){ gridPtr->reset(); }
-
     // draw grid and menu
     gridPtr->draw();
     menusPtr->draw();
 
-    // collapse next grid position
+    // calculate and set next grid updates
     gridPtr->update();
 
     EndDrawing();

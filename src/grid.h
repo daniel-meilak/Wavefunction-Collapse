@@ -1,6 +1,7 @@
 #pragma once
 
 #include<algorithm>
+#include<array>
 #include<bitset>
 #include<climits>
 #include<cstddef>
@@ -34,6 +35,13 @@ struct Grid{
    // map of number of connections for each tile. Only keeps track of uncollapsed tiles
    std::map<std::size_t,std::unordered_set<Point>> entropyList;
 
+   // array of all updates
+   std::array<std::pair<Point,tileState>, gridWidth*gridHeight> updates;
+
+   // indexes for updates filling & display
+   std::size_t fillingIndex{0};  // next index to fill from getNextCollapse
+   std::size_t currentIndex{0};  // index of currently visible update
+
    // grid update time
    int updateSpeed{30};
 
@@ -42,6 +50,9 @@ struct Grid{
 
    // wait timer
    float waitTimer{0.0f};
+
+   // internal time
+   float internalTime{0.0f};
 
    // flag for full collapse
    bool collapsed{false};
@@ -55,6 +66,12 @@ struct Grid{
 
    // Update grid
    void update();
+
+   // simulate next collape
+   void getNextCollapse();
+
+   // propagate effects of collapse
+   void propagate(const Point& currentPos);
 
    // Draw grid
    void draw();
@@ -103,7 +120,8 @@ bool Grid::waiting(){
    // If timer is active
    if (waitTimer > 0.0f){
       
-      if (sinceLastUpdate >= waitTimer){ collapsed = true; }
+      // if wait time has elapsed, reset grid
+      if (sinceLastUpdate >= waitTimer){ reset(); }
       
       return true;
    }
@@ -134,32 +152,17 @@ void Grid::reset(){
 
    // set wait timer to 0
    waitTimer = 0.0f;
+
+   // reset updates indexes
+   fillingIndex = 0;
+   currentIndex = 0;
+   internalTime = 0.0f;
 }
 
-void Grid::update(){
-
-   // if grid is paused
-   // or not enough time has passed for next update
-   // or there is a wait timer (grid is paused for 'waitTime' secs after completing a collapse)
-   // continue
-   if (!running || waiting() || sinceLastUpdate < 1.0f/updateSpeed){ return; }
-
-   // reset time since last update
-   sinceLastUpdate=0.0f;
-
-   // debug tileset
-   if constexpr (debug){
-      debugTileset();
-
-      // set grid speed back to zero
-      updateSpeed = 0;
-
-      return;
-   }
-
-   //------------------------------
-   // collapse a tile
-   //------------------------------
+//------------------------------
+// collapse a tile
+//------------------------------
+void Grid::getNextCollapse(){
 
    // get list of lowest entropies
    auto it = entropyList.begin();
@@ -175,7 +178,6 @@ void Grid::update(){
 
    // aliases for convenience
    Bitset& currentBitset = bitsetGrid[static_cast<std::size_t>(currentPos.y)][static_cast<std::size_t>(currentPos.x)];
-   tileState& currentTile = tileGrid[static_cast<std::size_t>(currentPos.y)][static_cast<std::size_t>(currentPos.x)];
 
    // if there are multiple possibilities
    if (entropy!=1){
@@ -197,8 +199,8 @@ void Grid::update(){
       currentBitset = Bitset{}.set(possibilities[dist(gen)]);
    }
 
-   // get tile configuration 
-   currentTile = getTile[currentBitset];
+   // add update to update list
+   updates[fillingIndex++] = {currentPos, getTile[currentBitset]};
 
    // remove from entropyList (only keep uncollapsed tiles)
    tiles.erase(currentPos);
@@ -206,19 +208,19 @@ void Grid::update(){
 
    // check if wavefunction is fully collapsed
    if (entropyList.empty()){
-
-      if constexpr (debug){ std::cout << "Grid is fully Collapsed!\n"; }
-
-      // pause grid for 5 seconds
-      waitTimer = waitTime;
-
+      collapsed = true;
       return;
    }
 
-   //------------------------------
    // propagate collapse
-   //------------------------------
+   propagate(currentPos);   
+}
 
+//------------------------------
+// propagate collapse
+//------------------------------
+void Grid::propagate(const Point& currentPos){
+   
    // keep track of tiles that have been resolved and those already in queue
    std::unordered_set<Point> resolvedTiles, inQueue;
 
@@ -273,11 +275,6 @@ void Grid::update(){
          // remove all disabled tiles (weight = 0)
          newPossibilities &= weightSwitch;
 
-         // error if no tile can be placed
-         if constexpr (debug && newPossibilities.count()==0){
-            std::cout << "Problem Here?" << std::endl;
-         }
-
          std::size_t oldCount=nearBitset.count(), newCount;
 
          // take all previous possible states in nearBitset and remove those not in newPossibilities
@@ -288,7 +285,7 @@ void Grid::update(){
 
          // if there is no possible tile to collapse to, the simulation ends
          if (newCount == 0){
-            std::cerr << "Tile {" << resolvingPos.x << "," << resolvingPos.y << "} cannot be collapsed. Resetting grid." <<std::endl;
+            std::cerr << "Tile {" << resolvingPos.x << "," << resolvingPos.y << "} cannot be collapsed. Resetting grid.\n";
             reset();
             return;
          }
@@ -314,6 +311,67 @@ void Grid::update(){
       // pop tile from resolving queue
       toResolve.pop();
    }      
+}
+
+void Grid::update(){
+   //-----------------------
+   // Calculate collapses
+   //-----------------------
+
+   // while grid isn't collapsed, calculate next three new steps each frame
+   if (!debug && !collapsed){
+      getNextCollapse();
+      getNextCollapse();
+      getNextCollapse();
+   }
+
+   //----------------------------
+   // Make next collapse visible
+   //----------------------------
+
+   // if grid is paused
+   // or there is a wait timer (grid is paused for 'waitTime' secs after completing a collapse)
+   // continue
+   if (!running || waiting()){
+      return;
+   }
+
+   // reset time since last update
+   sinceLastUpdate=0.0f;
+
+   // debug tileset
+   if constexpr (debug){
+      debugTileset();
+
+      // set grid speed back to zero
+      updateSpeed = 0;
+
+      return;
+   }
+
+   // update internal time
+   internalTime += static_cast<float>(updateSpeed)/fps;
+
+   // get new index to display
+   std::size_t toDisplay = static_cast<std::size_t>(internalTime);
+
+   // check if index is different
+   if (toDisplay != currentIndex){     
+
+      while (currentIndex != toDisplay){
+
+         // get next update
+         auto& nextState = updates[currentIndex]; 
+
+         // apply update 
+         tileGrid[static_cast<std::size_t>(nextState.first.y)][static_cast<std::size_t>(nextState.first.x)] = nextState.second;
+
+         // if at last index, wait 5 seconds before resetting
+         if (++currentIndex == gridHeight*gridWidth-1){
+            waitTimer = waitTime;
+         }
+      }
+   }
 }
 
 void Grid::draw(){
