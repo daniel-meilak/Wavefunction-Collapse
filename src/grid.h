@@ -68,10 +68,10 @@ struct Grid{
    void update();
 
    // simulate next collape
-   void getNextCollapse();
+   bool getNextCollapse();
 
    // propagate effects of collapse
-   void propagate(const Point& currentPos);
+   bool propagate(const Point& currentPos);
 
    // Draw grid
    void draw();
@@ -162,7 +162,7 @@ void Grid::reset(){
 //------------------------------
 // collapse a tile
 //------------------------------
-void Grid::getNextCollapse(){
+bool Grid::getNextCollapse(){
 
    // get list of lowest entropies
    auto it = entropyList.begin();
@@ -209,17 +209,17 @@ void Grid::getNextCollapse(){
    // check if wavefunction is fully collapsed
    if (entropyList.empty()){
       collapsed = true;
-      return;
+      return true;
    }
 
    // propagate collapse
-   propagate(currentPos);   
+   return propagate(currentPos);   
 }
 
 //------------------------------
 // propagate collapse
 //------------------------------
-void Grid::propagate(const Point& currentPos){
+bool Grid::propagate(const Point& currentPos){
    
    // keep track of tiles that have been resolved and those already in queue
    std::unordered_set<Point> resolvedTiles, inQueue;
@@ -283,11 +283,11 @@ void Grid::propagate(const Point& currentPos){
          // count possibilities
          newCount = nearBitset.count();
 
-         // if there is no possible tile to collapse to, the simulation ends
+         // if there is no possible tile to collapse to, resets
          if (newCount == 0){
             std::cerr << "Tile {" << resolvingPos.x << "," << resolvingPos.y << "} cannot be collapsed. Resetting grid.\n";
             reset();
-            return;
+            return false;
          }
 
          // if number of possibilities has changed, update entropyList
@@ -310,7 +310,9 @@ void Grid::propagate(const Point& currentPos){
 
       // pop tile from resolving queue
       toResolve.pop();
-   }      
+   }
+
+   return true;   
 }
 
 void Grid::update(){
@@ -318,11 +320,11 @@ void Grid::update(){
    // Calculate collapses
    //-----------------------
 
-   // while grid isn't collapsed, calculate next three new steps each frame
+   // while grid isn't collapsed, calculate next nCalc steps each frame
    if (!debug && !collapsed){
-      getNextCollapse();
-      getNextCollapse();
-      getNextCollapse();
+      for (int i=0; i<nCalcs; i++){
+         if (!getNextCollapse()){ return ; }
+      }
    }
 
    //----------------------------
@@ -332,9 +334,7 @@ void Grid::update(){
    // if grid is paused
    // or there is a wait timer (grid is paused for 'waitTime' secs after completing a collapse)
    // continue
-   if (!running || waiting()){
-      return;
-   }
+   if (!running || waiting()){ return; }
 
    // reset time since last update
    sinceLastUpdate=0.0f;

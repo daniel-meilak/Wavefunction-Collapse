@@ -20,6 +20,9 @@ constexpr int fps{60};
 // tile size multiplier
 constexpr int scaling{2};
 
+// number of simulated steps per display
+constexpr int nCalcs{2};
+
 // tile width/height original size (pixels)
 constexpr int tileSize{32};
 constexpr int tileArea{tileSize*tileSize};
