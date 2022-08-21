@@ -40,7 +40,7 @@ int main(){
 
     // Web version uses emscripten function
     #ifdef PLATFORM_WEB
-        emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
+        emscripten_set_main_loop(UpdateDrawFrame, fps, 1);
     #else
         SetTargetFPS(fps);
         while(!WindowShouldClose()){ UpdateDrawFrame(); }
