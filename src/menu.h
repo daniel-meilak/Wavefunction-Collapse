@@ -36,13 +36,13 @@ struct MenuBase {
    void move(float newX, float newY);
 
    // display menu (sections, buttons and min/max)
-   virtual void display();
+   virtual void draw();
 
    virtual ~MenuBase(){}; 
 };
 
 // display menu (sections, buttons and min/max)
-void MenuBase::display(){
+void MenuBase::draw(){
    if (maximized){ for (auto& section : sections){ section->display(); } }
 };
 
@@ -55,15 +55,15 @@ struct MenuHorizontal : MenuBase{
 
    MenuHorizontal(float x, float y): MenuBase(x,y){};
 
-   void display() override;
+   void draw() override;
 
    template<typename SectionType, typename ...Ts>
    void addSection(Ts&&... args);
 };
 
-void MenuHorizontal::display(){
+void MenuHorizontal::draw(){
 
-   MenuBase::display();
+   MenuBase::draw();
 
    // min/max button
    if (button.display()){
@@ -100,16 +100,16 @@ struct MenuVertical : MenuBase{
 
    MenuVertical(float x, float y): MenuBase(x,y){};
 
-   void display() override;
+   void draw() override;
 
    // add different types of Section
    template<typename SectionType, typename ...Ts>
    void addSection(Ts&&... args);
 };
 
-void MenuVertical::display(){
+void MenuVertical::draw(){
 
-   MenuBase::display();
+   MenuBase::draw();
 
    // min/max button
    if (button.display()){
@@ -174,5 +174,5 @@ public:
       menus.push_back(std::move(tileMenu));
    };
 
-   void display(){ for (auto& menu : menus){ menu->display(); } };
+   void draw(){ for (auto& menu : menus){ menu->draw(); } };
 };

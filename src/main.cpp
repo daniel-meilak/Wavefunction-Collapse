@@ -72,7 +72,7 @@ void UpdateDrawFrame(){
 
     // draw grid and menu
     gridPtr->draw();
-    menusPtr->display();
+    menusPtr->draw();
 
     // collapse next grid position
     gridPtr->update();
